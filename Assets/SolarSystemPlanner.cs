@@ -25,26 +25,26 @@ public class SolarSystemPlanner : MonoBehaviour
         if (globalSettings == null)
         {
             //grab from "settings" tag
-            GameObject[] settings = GameObject.FindGameObjectsWithTag("Settings");
-            if (settings.Length == 0)
+            GameObject[] _settings = GameObject.FindGameObjectsWithTag("Settings");
+            if (_settings.Length == 0)
             {
                 Debug.LogError("No settings found");
                 return;
             }
-            if (settings.Length > 1)
+            if (_settings.Length > 1)
             {
                 Debug.LogError("Multiple settings found");
                 return;
             }
-            GameObject globalSettingsobj = settings[0];
-            Debug.Log("name: " + globalSettingsobj.name);
-            GlobalsLoader GlobalsLoaderCompt = globalSettingsobj.GetComponent<GlobalsLoader>();
-            if (GlobalsLoaderCompt == null)
+            GameObject _globalSettingsobj = _settings[0];
+            Debug.Log("name: " + _globalSettingsobj.name);
+            GlobalsLoader _GlobalsLoaderCompt = _globalSettingsobj.GetComponent<GlobalsLoader>();
+            if (_GlobalsLoaderCompt == null)
             {
                 Debug.LogError("No GlobalsLoader found");
                 return;
             }
-            globalSettings = GlobalsLoaderCompt.globalVars;
+            globalSettings = _GlobalsLoaderCompt.globalVars;
             Debug.Log("Global settings Found");
         }
         Debug.Log("Global settings: " + globalSettings);
@@ -57,9 +57,9 @@ public class SolarSystemPlanner : MonoBehaviour
     [Button]
     private void GenerateRandomSolarSystemPlan()
     {
+        ResetRandomSeed();
         solarSystemPlan = new SolarSystemPlan();
         int seed = Random.Range(0, 1000000);
-
         StarSettings starSettings = new StarSettings();
         starSettings.seed = seed;
         seed += 1;
@@ -73,23 +73,27 @@ public class SolarSystemPlanner : MonoBehaviour
         {
             PlanetSettings planetSettings = new PlanetSettings();
             planetSettings.seed = seed;
+            SetRandomSeedToNumber(seed);
             seed += 1;
-            planetSettings.planetRadius = Random.Range(20, 80) + Random.Range(-20, 20);
+            
+            planetSettings.planetRadius = Random.Range(30, 120) + Random.Range(-30, 30);
             planetSettings.planetMass = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.planetTemperature = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.planetMoons = Random.Range(0, 2);
-            planetSettings.planetOrbit = Random.Range(20, 80) + Random.Range(-20, 20);
+            planetSettings.planetOrbit = Random.Range(10, 40) + Random.Range(-10, 10);
             planetSettings.planetOrbitSpeed = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.minDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.maxDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.VarDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
-            planetSettings.DistanceFromStar = Random.Range(20, 80) + Random.Range(-20, 20);
+            planetSettings.DistanceFromStar = Random.Range(40, 200) + Random.Range(-20, 20);
 
             int numberOfMoons = Random.Range(0, 10);
             for (int j = 0; j < numberOfMoons; j++)
             {
                 MoonSettings moonSettings = new MoonSettings();
                 moonSettings.seed = seed;
+                SetRandomSeedToNumber(seed);
+
                 seed += 1;
                 moonSettings.moonRadius = Random.Range(20, 80) + Random.Range(-20, 20);
                 moonSettings.moonMass = Random.Range(20, 80) + Random.Range(-20, 20);
@@ -99,7 +103,11 @@ public class SolarSystemPlanner : MonoBehaviour
                 moonSettings.DistanceFromPlanet = Random.Range(20, 80) + Random.Range(-20, 20);
                 planetSettings.moons.Add(moonSettings);
             }
+            //sort moons by distance from planet
+            planetSettings.moons.Sort((x, y) => x.DistanceFromPlanet.CompareTo(y.DistanceFromPlanet));
             solarSystemPlan.planets.Add(planetSettings);
+            //sort planets by distance from star
+            solarSystemPlan.planets.Sort((x, y) => x.DistanceFromStar.CompareTo(y.DistanceFromStar));
         }
     }
 
@@ -112,10 +120,11 @@ public class SolarSystemPlanner : MonoBehaviour
         DefaultMoonSettings defMoon = globalSettings.defaultMoonSettings;
         solarSystemPlan = new SolarSystemPlan();
         int seed = globalSettings.seed;
-
         StarSettings starSettings = new StarSettings();
         starSettings.seed = seed;
+        SetRandomSeedToNumber(seed);
         seed += 1;
+
         starSettings.starRadius = Random.Range(defStar.starRadiusBaseMin, defStar.starRadiusBaseMax) + Random.Range(-defStar.starRadiusVarience, defStar.starRadiusVarience);
         starSettings.starMass = Random.Range(defStar.starMassBaseMin, defStar.starMassBaseMax) + Random.Range(-defStar.starMassVarience, defStar.starMassVarience);
         starSettings.starTemperature = Random.Range(defStar.starTemperatureBaseMin, defStar.starTemperatureBaseMax) + Random.Range(-defStar.starTemperatureVarience, defStar.starTemperatureVarience);
@@ -127,7 +136,9 @@ public class SolarSystemPlanner : MonoBehaviour
         {
             PlanetSettings planetSettings = new PlanetSettings();
             planetSettings.seed = seed;
+            SetRandomSeedToNumber(seed);
             seed += 1;
+
             planetSettings.planetRadius = Random.Range(defPlanet.planetRadiusBaseMin, defPlanet.planetRadiusBaseMax) + Random.Range(-defPlanet.planetRadiusVarience, defPlanet.planetRadiusVarience);
             planetSettings.planetMass = Random.Range(defPlanet.planetMassBaseMin, defPlanet.planetMassBaseMax) + Random.Range(-defPlanet.planetMassVarience, defPlanet.planetMassVarience);
             planetSettings.planetTemperature = Random.Range(defPlanet.planetTemperatureBaseMin, defPlanet.planetTemperatureBaseMax) + Random.Range(-defPlanet.planetTemperatureVarience, defPlanet.planetTemperatureVarience);
@@ -150,7 +161,9 @@ public class SolarSystemPlanner : MonoBehaviour
             {
                 MoonSettings moonSettings = new MoonSettings();
                 moonSettings.seed = seed;
+                SetRandomSeedToNumber(seed);
                 seed += 1;
+
                 moonSettings.moonRadius = Random.Range(defMoon.moonRadiusBaseMin, defMoon.moonRadiusBaseMax) + Random.Range(-defMoon.moonRadiusVarience, defMoon.moonRadiusVarience);
                 moonSettings.moonMass = Random.Range(defMoon.moonMassBaseMin, defMoon.moonMassBaseMax) + Random.Range(-defMoon.moonMassVarience, defMoon.moonMassVarience);
                 moonSettings.moonTemperature = Random.Range(defMoon.moonTemperatureBaseMin, defMoon.moonTemperatureBaseMax) + Random.Range(-defMoon.moonTemperatureVarience, defMoon.moonTemperatureVarience);
@@ -158,10 +171,14 @@ public class SolarSystemPlanner : MonoBehaviour
                 moonSettings.moonOrbitSpeed = Random.Range(defMoon.moonOrbitSpeedBaseMin, defMoon.moonOrbitSpeedBaseMax) + Random.Range(-defMoon.moonOrbitSpeedVarience, defMoon.moonOrbitSpeedVarience);
                 moonSettings.DistanceFromPlanet = Random.Range(defMoon.DistanceFromPlanetBaseMin, defMoon.DistanceFromPlanetBaseMax) + Random.Range(-defMoon.DistanceFromPlanetVarience, defMoon.DistanceFromPlanetVarience);
                 planetSettings.moons.Add(moonSettings);
+                //sort moons by distance from planet
+                planetSettings.moons.Sort((x, y) => x.DistanceFromPlanet.CompareTo(y.DistanceFromPlanet));
             }
 
 
             solarSystemPlan.planets.Add(planetSettings);
+            //sort planets by distance from star
+            solarSystemPlan.planets.Sort((x, y) => x.DistanceFromStar.CompareTo(y.DistanceFromStar));
         }
     }
 
@@ -250,5 +267,17 @@ public class SolarSystemPlanner : MonoBehaviour
         solarSystemPlan = JsonUtility.FromJson<SolarSystemPlan>(json);
         //print
         Debug.Log("Loaded from " + filePath);
+    }
+
+    //resets random seed
+    private void ResetRandomSeed()
+    {
+        Random.InitState(System.Environment.TickCount);
+    }
+
+    //sets random seed to the seed of the solar system plan
+    private void SetRandomSeedToNumber(int seed)
+    {
+        Random.InitState(seed);
     }
 }

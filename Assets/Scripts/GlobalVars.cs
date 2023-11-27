@@ -8,6 +8,8 @@ public class GlobalVars
 {
     // Global script for storing global variables
     public int seed = 42;
+    public bool RotateSolarSystem = true;
+    public float RotateSpeed = 1;
     public DefaultPlanetSettings defaultPlanetSettings = new DefaultPlanetSettings();
 
     public DefaultStarSettings defaultStarSettings = new DefaultStarSettings();
@@ -48,8 +50,8 @@ public class DefaultPlanetSettings
 {
     // Default star settings
     public float planetRadiusVarience = 20;
-    public float planetRadiusBaseMin = 20;
-    public float planetRadiusBaseMax = 80;
+    public float planetRadiusBaseMin = 40;
+    public float planetRadiusBaseMax = 120;
 
     public float planetMassVarience = 20;
     public float planetMassBaseMin = 20;
@@ -63,17 +65,17 @@ public class DefaultPlanetSettings
     public float planetOrbitBaseMin = 20;
     public float planetOrbitBaseMax = 80;
 
-    public float planetOrbitSpeedVarience = 20;
-    public float planetOrbitSpeedBaseMin = 20;
-    public float planetOrbitSpeedBaseMax = 80;
+    public float planetOrbitSpeedVarience = 10;
+    public float planetOrbitSpeedBaseMin = 10;
+    public float planetOrbitSpeedBaseMax = 40;
 
     public float minDistanceBetweenMoonsVarience = 20;
     public float minDistanceBetweenMoonsBaseMin = 20;
     public float minDistanceBetweenMoonsBaseMax = 80;
 
     public float DistanceFromStarVarience = 20;
-    public float DistanceFromStarBaseMin = 20;
-    public float DistanceFromStarBaseMax = 80;
+    public float DistanceFromStarBaseMin = 40;
+    public float DistanceFromStarBaseMax = 200;
 
     public float AverageMoons = 2;
     public float MoonVarience = 1;
