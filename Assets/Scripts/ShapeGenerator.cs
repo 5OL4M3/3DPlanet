@@ -20,7 +20,7 @@ public class ShapeGenerator
     public Vector3 CalculatePointOnPlanet(Vector3 pointOnUnitSphere)
     {
         float elevation = 0;
-        float continentLayer = 0;
+        float firstLayerValue = 0;
         float oceanLayer = 0;
         //Ocean Layer
         if (shapeSettings.oceanSetting.enable)
@@ -28,10 +28,6 @@ public class ShapeGenerator
             oceanLayer = shapeSettings.oceanSetting.Evaluate(pointOnUnitSphere);
         }
 
-        //Continent Shape
-        
-
-        
         if (noiseFilters.Length > 0)
         {
             firstLayerValue = noiseFilters[0].Evaluate(pointOnUnitSphere);
@@ -41,16 +37,17 @@ public class ShapeGenerator
             }
         }
 
+        //Continent Shape
         for (int i = 0; i < noiseFilters.Length; i++)
         {
             if (shapeSettings.noiseLayers[i].enable)
             {
                 float mask = (shapeSettings.noiseLayers[i].useFirstLayerAsMask) ? firstLayerValue : 1;
-                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere) * mask;
+                elevation += (oceanLayer == 0) ? noiseFilters[i].Evaluate(pointOnUnitSphere) * mask : oceanLayer;
             }
             
         }
-        
+
         return pointOnUnitSphere * shapeSettings.planetRadius * (1 + elevation);
     }
 }

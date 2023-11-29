@@ -19,7 +19,6 @@ public class Planet : MonoBehaviour {
     [HideInInspector]
     public bool colorSettingsFold;
 
-
     ShapeGenerator shapeGenerator;
 
     [SerializeField, HideInInspector]
@@ -45,7 +44,7 @@ public class Planet : MonoBehaviour {
                 GameObject meshObj = new GameObject("mesh");
                 meshObj.transform.parent = transform;
 
-                meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
+                meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                 meshFilters[i] = meshObj.AddComponent<MeshFilter>();
                 meshFilters[i].sharedMesh = new Mesh();
             }

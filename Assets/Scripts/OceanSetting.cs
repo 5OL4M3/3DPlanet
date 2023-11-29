@@ -12,7 +12,7 @@ public class OceanSetting
     public float roughness = 2;
     public float minValue = 1;
     public Vector3 center;
-    private int numberLayers = 3;
+    private int numberLayers = 4;
     private float persistence = 0.5f;
 
     Noise noise = new Noise();
@@ -35,3 +35,4 @@ public class OceanSetting
         return noiseVal * depth;
     }
 }
+
