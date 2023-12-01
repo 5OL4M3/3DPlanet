@@ -32,21 +32,23 @@ public class Planet : MonoBehaviour
 
     public int PlanetSplitCount = 2;
 
-    public int PlanetMeshCount = 24;
+    //public int PlanetMeshCount = 24;
 
     MeshFilter[] oceanFilters;
     TerrainFace[] oceanFaces;
 
 
 
-    void Initialize(out TerrainFace[] _returnedFaces, out MeshFilter[] _returnedMeshFilters)
+    void Initialize(out TerrainFace[] _returnedFaces, out MeshFilter[] _returnedMeshFilters, int _PlanetSplitCount)
     {
+        int PlanetMeshCount = _PlanetSplitCount * _PlanetSplitCount * 6;
+
         shapeGenerator = new ShapeGenerator(shapeSettings);
 
-        _checkIfValid();
+        _checkIfValid(_PlanetSplitCount);
         TerrainFace[] _terrainFaces = new TerrainFace[PlanetMeshCount];
         MeshFilter[] _meshFilters = new MeshFilter[PlanetMeshCount];
-        int meshesPerFace = PlanetSplitCount * PlanetSplitCount;
+        int meshesPerFace = _PlanetSplitCount * _PlanetSplitCount;
 
         Vector3[] directions = { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
 
@@ -73,7 +75,7 @@ public class Planet : MonoBehaviour
             {
                 meshArray[j] = _meshFilters[i * meshesPerFace + j].sharedMesh;
             }
-            _terrainFaces[i] = new TerrainFace(shapeGenerator, meshArray, resolution, directions[i % 6], PlanetSplitCount);
+            _terrainFaces[i] = new TerrainFace(shapeGenerator, meshArray, resolution, directions[i % 6], _PlanetSplitCount);
 
         }
 
@@ -101,7 +103,7 @@ public class Planet : MonoBehaviour
 
 
 
-    public void GeneratePlanet()
+    public void GeneratePlanet(int _PlanetSplitCount)
     {
         //check for old meshes in children, delete if name includes "planetmesh" or "oceanmesh"
         foreach (Transform child in transform)
@@ -112,12 +114,12 @@ public class Planet : MonoBehaviour
             }
 
         }
-        MeshFilter[] mfland = new MeshFilter[PlanetMeshCount];
-        MeshFilter[] mfocean = new MeshFilter[PlanetMeshCount];
-        Initialize(out terrainFaces, out mfland);
+        MeshFilter[] mfland = new MeshFilter[_PlanetSplitCount * _PlanetSplitCount * 6];
+        MeshFilter[] mfocean = new MeshFilter[_PlanetSplitCount * _PlanetSplitCount * 6];
+        Initialize(out terrainFaces, out mfland, PlanetSplitCount);
         
-        mfland = GenerateMesh(mfland);
-        Initialize(out oceanFaces, out mfocean);
+        mfland = GenerateMesh(mfland, PlanetSplitCount);
+        Initialize(out oceanFaces, out mfocean, 1);
         GenerateOcean(mfocean);
         //GenerateColors(mfland, colorSettings.planetColor);
         GenerateColors(mfocean, Color.blue);
@@ -134,7 +136,7 @@ public class Planet : MonoBehaviour
     {
         if (autoUpdate)
         {
-            GeneratePlanet();
+            GeneratePlanet(PlanetSplitCount);
         }
     }
 
@@ -142,12 +144,13 @@ public class Planet : MonoBehaviour
     {
         if (autoUpdate)
         {
-            GeneratePlanet();
+            GeneratePlanet(PlanetSplitCount);
         }
     }
 
-    MeshFilter[] GenerateMesh(MeshFilter[] _meshFilters)
-    {
+    MeshFilter[] GenerateMesh(MeshFilter[] _meshFilters, int _PlanetSplitCount)
+    {   
+        int PlanetMeshCount = _PlanetSplitCount * _PlanetSplitCount * 6;
         //use the first terrainface to generate the mesh for all
 
         if (_meshFilters[0].gameObject.activeSelf)
@@ -171,9 +174,9 @@ public class Planet : MonoBehaviour
 
 
 
-        MeshFilter[] GenerateOcean(MeshFilter[] _meshFilters)
-        {
-             //use the first terrainface to generate the mesh for all
+    MeshFilter[] GenerateOcean(MeshFilter[] _meshFilters)
+    {
+        //use the first terrainface to generate the mesh for all
 
         if (_meshFilters[0].gameObject.activeSelf)
         {
@@ -181,7 +184,7 @@ public class Planet : MonoBehaviour
         }
 
         //rename the rest of the meshes
-        for (int i = 0; i < PlanetMeshCount; i++)
+        for (int i = 0; i < 6; i++)
         {
             if (_meshFilters[i].gameObject.activeSelf)
             {
@@ -193,55 +196,64 @@ public class Planet : MonoBehaviour
 
         return _meshFilters;
 
-        }
-
-        void GenerateColors(MeshFilter[] mfs, Color col)
-        {
-            if (mfs == null || mfs.Length == 0)
-            {
-                return;
-            }
-            foreach (MeshFilter filter in mfs)
-            {
-                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
-                mat.color = col;
-            }
-        }
-
-        void setToRandomMeshColors(MeshFilter[] mfs)
-        {
-            if (mfs == null || mfs.Length == 0)
-            {
-                return;
-            }
-            foreach (MeshFilter filter in mfs)
-            {
-                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
-                mat.color = Random.ColorHSV();
-            }
-        }
-
-        [SerializeField]
-        [Button]
-        public void _checkIfValid()
-        {
-            //refresh meshFilters
-            meshFilters = new MeshFilter[PlanetMeshCount];
-            oceanFilters = new MeshFilter[PlanetMeshCount];
-            for (int i = 0; i < PlanetMeshCount; i++)
-            {
-                meshFilters[i] = null;
-                oceanFilters[i] = null;
-            }
-
-            //refresh terrainFaces
-            terrainFaces = new TerrainFace[PlanetMeshCount];
-            oceanFaces = new TerrainFace[PlanetMeshCount];
-            for (int i = 0; i < PlanetMeshCount; i++)
-            {
-                terrainFaces[i] = null;
-                oceanFaces[i] = null;
-            }
-        }
-
     }
+
+    void GenerateColors(MeshFilter[] mfs, Color col)
+    {
+        if (mfs == null || mfs.Length == 0)
+        {
+            return;
+        }
+        foreach (MeshFilter filter in mfs)
+        {
+            Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+            mat.color = col;
+        }
+    }
+
+    void setToRandomMeshColors(MeshFilter[] mfs)
+    {
+        if (mfs == null || mfs.Length == 0)
+        {
+            return;
+        }
+        foreach (MeshFilter filter in mfs)
+        {
+            Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+            mat.color = Random.ColorHSV();
+        }
+    }
+
+    [SerializeField]
+    [Button]
+    public void _checkIfValid(int _PlanetSplitCount)
+    {
+        int PlanetMeshCount = _PlanetSplitCount * _PlanetSplitCount * 6;
+        //refresh meshFilters
+        meshFilters = new MeshFilter[PlanetMeshCount];
+        oceanFilters = new MeshFilter[6];
+        for (int i = 0; i < PlanetMeshCount; i++)
+        {
+            meshFilters[i] = null;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            oceanFilters[i] = null;
+        }
+        
+        //refresh terrainFaces
+        terrainFaces = new TerrainFace[PlanetMeshCount];
+        oceanFaces = new TerrainFace[6];
+        for (int i = 0; i < PlanetMeshCount; i++)
+        {
+            terrainFaces[i] = null;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            terrainFaces[i] = null;
+            oceanFaces[i] = null;
+        }
+    }
+
+}
