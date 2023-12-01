@@ -1,103 +1,136 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class TerrainFace
 {
     ShapeGenerator shapeGenerator;
-    Mesh mesh;
+    Mesh[] meshes;
     int resolution;
     Vector3 normal;
     Vector3 axisA;
     Vector3 axisB;
+    int planetSplits;
 
-    public TerrainFace(ShapeGenerator shapeGenerator, Mesh mesh, int resolution, Vector3 normal)
+    public delegate Vector3 GeneratorDelegate(Vector3 pos);
+    public GeneratorDelegate oceanMeshCallback;
+    public GeneratorDelegate landMeshCallback;
+
+    public TerrainFace(ShapeGenerator shapeGenerator, Mesh[] meshes, int resolution, Vector3 normal, int planetSplits)
     {
         this.shapeGenerator = shapeGenerator;
-        this.mesh = mesh;
+        this.meshes = meshes;
         this.resolution = resolution;
+        this.planetSplits = planetSplits;
         this.normal = normal;
 
         axisA = new Vector3(normal.y, normal.z, normal.x);
         axisB = Vector3.Cross(normal, axisA);
     }
 
-    public void ConstructMesh()
+    public void ConstructMesh(GeneratorDelegate generatorFunction, MeshFilter[] meshFilters)
     {
-        Vector3[] vertices = new Vector3[resolution * resolution];
-        int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
-        int triIndex = 0;
-        int i = 0;
-        
-        for (int row = 0; row < resolution; row++)
+        Assert.IsTrue(resolution % planetSplits == 0);
+        Assert.IsTrue(resolution >= planetSplits * planetSplits);
+        int meshesPerFace = planetSplits * planetSplits;
+        int pieceRes = resolution / planetSplits;
+
+        for (int face = 0; face < 6; face++)
         {
-            for (int col = 0; col < resolution; col++)
+            //recalc axisA and axisB
+            Vector3[] directions = { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
+            switch (face)
             {
-                
-                Vector2 percent = new Vector2(col, row) / (resolution - 1);
-                Vector3 currentPoint = normal + (2 * percent.x - 1) * axisA + (2 * percent.y - 1) * axisB;
-                vertices[i] = shapeGenerator.CalculatePointOnPlanet(currentPoint.normalized);
+                case 0:
+                    normal = directions[0];
+                    break;
+                case 1:
+                    normal = directions[1];
+                    break;
+                case 2:
+                    normal = directions[2];
+                    break;
+                case 3:
+                    normal = directions[3];
+                    break;
+                case 4:
+                    normal = directions[4];
+                    break;
+                case 5:
+                    normal = directions[5];
+                    break;
+            }
+            axisA = new Vector3(normal.y, normal.z, normal.x);
+            axisB = Vector3.Cross(normal, axisA);
+            for (int idx = 0; idx < meshesPerFace; idx++)
+            {
+                int x = idx % planetSplits;
+                int y = idx / planetSplits;
 
-                //If not the last col or the last row
-                if (col != resolution - 1 && row != resolution - 1)
+                Vector3[] vertices = new Vector3[pieceRes * pieceRes];
+                int[] triangles = new int[(pieceRes - 1) * (pieceRes - 1) * 6];
+                int triIndex = 0;
+                int i = 0;
+                for (int row = 0; row < pieceRes; row++)
                 {
-                    triangles[triIndex] = i;
-                    triangles[triIndex+1] = i + resolution + 1;
-                    triangles[triIndex+2] = i + resolution;
+                    for (int col = 0; col < pieceRes; col++)
+                    {
+                        //scaled by meshes per face
+                        Vector2 percent = new Vector2(col, row) / ((pieceRes - 1) * planetSplits);
+                        percent.x += x * 1f / planetSplits;
+                        percent.y += y * 1f / planetSplits;
+                        //Debug.Log("Percent: " + percent);
 
-                    triangles[triIndex+3] = i;
-                    triangles[triIndex+4] = i + 1;
-                    triangles[triIndex+5] = i + resolution + 1;
-                    triIndex += 6;
+
+
+                        Vector3 pointOnUnitCube = normal + (percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB;
+                        Vector3 pointOnUnitSphere = pointOnUnitCube.normalized;
+
+                        vertices[i] = generatorFunction(pointOnUnitSphere);
+
+                        //If not the last col or the last row
+                        if (col != pieceRes - 1 && row != pieceRes - 1)
+                        {
+                            triangles[triIndex] = i;
+                            triangles[triIndex + 1] = i + pieceRes + 1;
+                            triangles[triIndex + 2] = i + pieceRes;
+
+                            triangles[triIndex + 3] = i;
+                            triangles[triIndex + 4] = i + 1;
+                            triangles[triIndex + 5] = i + pieceRes + 1;
+                            triIndex += 6;
+                        }
+
+                        i++;
+                    }
                 }
 
-                i++;
+                meshes[idx] = new Mesh();
+                meshes[idx].vertices = vertices;
+                meshes[idx].triangles = triangles;
+                meshes[idx].RecalculateNormals();
+
+                meshFilters[face * meshesPerFace + idx].sharedMesh = meshes[idx];
+
+
+
             }
         }
 
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
     }
 
-    public void ConstructOceanMesh()
+    public void ConstructOceanMesh(MeshFilter[] meshFilters)
     {
-        Vector3[] vertices = new Vector3[resolution * resolution];
-        int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
-        int triIndex = 0;
-        int i = 0;
-        
-        for (int row = 0; row < resolution; row++)
-        {
-            for (int col = 0; col < resolution; col++)
-            {
-                
-                Vector2 percent = new Vector2(col, row) / (resolution - 1);
-                Vector3 currentPoint = normal + (2 * percent.x - 1) * axisA + (2 * percent.y - 1) * axisB;
-                vertices[i] = shapeGenerator.CalculatePointOnOcean(currentPoint.normalized);
-
-                //If not the last col or the last row
-                if (col != resolution - 1 && row != resolution - 1)
-                {
-                    triangles[triIndex] = i;
-                    triangles[triIndex+1] = i + resolution + 1;
-                    triangles[triIndex+2] = i + resolution;
-
-                    triangles[triIndex+3] = i;
-                    triangles[triIndex+4] = i + 1;
-                    triangles[triIndex+5] = i + resolution + 1;
-                    triIndex += 6;
-                }
-
-                i++;
-            }
-        }
-
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        oceanMeshCallback = shapeGenerator.CalculatePointOnOcean;
+        ConstructMesh(oceanMeshCallback, meshFilters);
+        Debug.Log("Finished constructing ocean mesh");
     }
 
+    public void ConstructLandMesh(MeshFilter[] meshFilters)
+    {
+        landMeshCallback = shapeGenerator.CalculatePointOnPlanet;
+        ConstructMesh(landMeshCallback, meshFilters);
+        Debug.Log("Finished constructing land mesh");
+    }
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a64d951c6e4a4546b3f226f58776eea, type: 3}
   m_Name: Shape
   m_EditorClassIdentifier: 
-  planetRadius: 24.49
+  planetRadius: 25
   noiseLayers:
   - enable: 1
     useFirstLayerAsMask: 0
@@ -80,7 +80,7 @@ MonoBehaviour:
   oceanSetting:
     enable: 1
     depth: -1
-    baseRoughness: 1.9
-    roughness: 1.89
+    baseRoughness: 1.58
+    roughness: 2.19
     minValue: 0.89
     center: {x: 0.46, y: 4.33, z: 0.51}
