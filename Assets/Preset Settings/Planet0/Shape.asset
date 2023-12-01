@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a64d951c6e4a4546b3f226f58776eea, type: 3}
   m_Name: Shape
   m_EditorClassIdentifier: 
-  planetRadius: 18.22
+  planetRadius: 24.49
   noiseLayers:
-  - enable: 0
+  - enable: 1
     useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 0
       simpleNoiseSettings:
         strength: 0.01
-        numberLayers: 3
-        baseRoughness: 0.55
-        roughness: 3
-        persistence: 0.76
+        numberLayers: 4
+        baseRoughness: 2.3
+        roughness: 12.46
+        persistence: 0.46
         center: {x: -5.16, y: -2.23, z: -0.06}
-        minValue: 0.87
+        minValue: -0.18
       rigidNoiseSettings:
         strength: 0
         numberLayers: 0
@@ -36,7 +36,7 @@ MonoBehaviour:
         minValue: 0
         weightMultiplier: 0
   - enable: 1
-    useFirstLayerAsMask: 1
+    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 1
       simpleNoiseSettings:
@@ -48,14 +48,14 @@ MonoBehaviour:
         center: {x: -5.16, y: -2.23, z: -0.06}
         minValue: 1
       rigidNoiseSettings:
-        strength: 11.4
+        strength: 1.2
         numberLayers: 6
-        baseRoughness: 2.52
-        roughness: 1.43
+        baseRoughness: 0.14
+        roughness: 10
         persistence: 0.19
-        center: {x: 0.47, y: 0, z: 0}
-        minValue: 0
-        weightMultiplier: 0.65
+        center: {x: 0.63, y: 0, z: 0}
+        minValue: 1.09
+        weightMultiplier: 2.14
   - enable: 1
     useFirstLayerAsMask: 0
     noiseSettings:
@@ -63,7 +63,7 @@ MonoBehaviour:
       simpleNoiseSettings:
         strength: 0.08
         numberLayers: 5
-        baseRoughness: 1.64
+        baseRoughness: 2.85
         roughness: 2.68
         persistence: 0.52
         center: {x: -5.16, y: -2.23, z: -0.06}
@@ -79,8 +79,8 @@ MonoBehaviour:
         weightMultiplier: 0.36
   oceanSetting:
     enable: 1
-    depth: -0.486
-    baseRoughness: 1.73
-    roughness: 1.52
-    minValue: 1
-    center: {x: 2.05, y: 4.33, z: 0.51}
+    depth: -1
+    baseRoughness: 1.9
+    roughness: 1.89
+    minValue: 0.89
+    center: {x: 0.46, y: 4.33, z: 0.51}

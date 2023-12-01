@@ -61,4 +61,43 @@ public class TerrainFace
         mesh.RecalculateNormals();
     }
 
+    public void ConstructOceanMesh()
+    {
+        Vector3[] vertices = new Vector3[resolution * resolution];
+        int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
+        int triIndex = 0;
+        int i = 0;
+        
+        for (int row = 0; row < resolution; row++)
+        {
+            for (int col = 0; col < resolution; col++)
+            {
+                
+                Vector2 percent = new Vector2(col, row) / (resolution - 1);
+                Vector3 currentPoint = normal + (2 * percent.x - 1) * axisA + (2 * percent.y - 1) * axisB;
+                vertices[i] = shapeGenerator.CalculatePointOnOcean(currentPoint.normalized);
+
+                //If not the last col or the last row
+                if (col != resolution - 1 && row != resolution - 1)
+                {
+                    triangles[triIndex] = i;
+                    triangles[triIndex+1] = i + resolution + 1;
+                    triangles[triIndex+2] = i + resolution;
+
+                    triangles[triIndex+3] = i;
+                    triangles[triIndex+4] = i + 1;
+                    triangles[triIndex+5] = i + resolution + 1;
+                    triIndex += 6;
+                }
+
+                i++;
+            }
+        }
+
+        mesh.Clear();
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+    }
+
 }

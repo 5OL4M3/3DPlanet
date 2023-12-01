@@ -6,7 +6,7 @@ using UnityEngine;
 public class OceanSetting
 {
     public bool enable;
-    [Range(-0.5f, 0.0f)]
+    [Range(-1.0f, 0.0f)]
     public float depth = -0.35f;
     public float baseRoughness = 1;
     public float roughness = 2;

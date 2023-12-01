@@ -43,12 +43,18 @@ public class ShapeGenerator
             if (shapeSettings.noiseLayers[i].enable)
             {
                 float mask = (shapeSettings.noiseLayers[i].useFirstLayerAsMask) ? firstLayerValue : 1;
-                elevation += (oceanLayer == 0) ? noiseFilters[i].Evaluate(pointOnUnitSphere) * mask : oceanLayer;
+                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere) * mask;
             }
             
         }
 
+        elevation = (oceanLayer == 0) ? elevation : oceanLayer;
         return pointOnUnitSphere * shapeSettings.planetRadius * (1 + elevation);
+    }
+
+    public Vector3 CalculatePointOnOcean(Vector3 pointOnUnitSphere)
+    {
+        return pointOnUnitSphere * shapeSettings.planetRadius;
     }
 }
 
