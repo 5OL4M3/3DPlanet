@@ -68,6 +68,9 @@ public class DefaultPlanetSettings
     public float planetOrbitSpeedVarience = 10;
     public float planetOrbitSpeedBaseMin = 10;
     public float planetOrbitSpeedBaseMax = 40;
+    public float planetOrbitSpeedSelfVarience = 10;
+    public float planetOrbitSpeedSelfBaseMin = 10;
+    public float planetOrbitSpeedSelfBaseMax = 40;
 
     public float minDistanceBetweenMoonsVarience = 20;
     public float minDistanceBetweenMoonsBaseMin = 20;
@@ -100,6 +103,7 @@ public class PlanetSettings
     public float planetOrbit = 1;
 
     public float planetOrbitSpeed = 1;
+    public float planetOrbitSpeedSelf = 1;
 
     public float minDistanceBetweenMoons = 1;
     public float maxDistanceBetweenMoons = 1;

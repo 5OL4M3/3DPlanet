@@ -6,6 +6,7 @@ public class PlanetRotate : MonoBehaviour
 {
     private bool RotateSolarSystem;
     public float RotateSpeed;
+    public float RotateSpeedSelf;
     public float DistanceFromStar;
     public float PlanetRadius;
     private GlobalVars globalSettings;
@@ -50,6 +51,9 @@ public class PlanetRotate : MonoBehaviour
         if (RotateSolarSystem)
         {
             transform.RotateAround(Vector3.zero, Vector3.up, globalSettings.RotateSpeed * RotateSpeed * Time.deltaTime);
+
+            //rotate around own axis
+            transform.Rotate(Vector3.up * RotateSpeedSelf * Time.deltaTime);
         }
     }
     

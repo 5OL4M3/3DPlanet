@@ -75,15 +75,10 @@ public class SolarSystemGenerator : MonoBehaviour
             _planetObj.tag = "Planets";
 
             //assign a planet rotate script to the planet
-            PlanetRotate _planetRotate = _planetObj.AddComponent<PlanetRotate>();
-            //slow down rotaton of later planets and larger planets
-            _planetRotate.RotateSpeed = _planet.planetOrbitSpeed / _planetCount;
-            _planetRotate.RotateSpeed = (_planetRotate.RotateSpeed / (1 + Mathf.Log(_planetRadius)));
-            Debug.Log("Planet " + _planetCount + " Rotate Speed: " + _planetRotate.RotateSpeed);
-            //set the distance from the star
-            _planetRotate.DistanceFromStar = _planetDistance;
-            //set the planet radius
-            _planetRotate.PlanetRadius = _planetRadius;
+            PlanetRotate _planetRotateScript = GeneratePlanetRotateScript(_planetObj, _planet);
+
+            //assign a planet script to the planet
+            Planet _planetScript = GeneratePlanetScript(_planetObj, _planet);
 
             _planetCount++;
         }
@@ -103,6 +98,34 @@ public class SolarSystemGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    //private function helps generate variables for planets
+    private PlanetRotate GeneratePlanetRotateScript(GameObject _planetObj, PlanetSettings _planet)
+    {
+        PlanetRotate _planetRotate = _planetObj.AddComponent<PlanetRotate>();
+        //slow down rotaton of later planets and larger planets
+        _planetRotate.RotateSpeed = _planet.planetOrbitSpeed;
+        _planetRotate.RotateSpeed = (_planetRotate.RotateSpeed / (1 + Mathf.Log(_planet.planetRadius)));
+        Debug.Log("Planet Rotate Speed: " + _planetRotate.RotateSpeed);
+        //set the distance from the star
+        _planetRotate.DistanceFromStar = _planet.DistanceFromStar;
+        //set the planet radius
+        _planetRotate.PlanetRadius = _planet.planetRadius;
+        //set the planet rotation speed
+        _planetRotate.RotateSpeedSelf = _planet.planetOrbitSpeedSelf;
+        return _planetRotate;
+    }
+
+    private Planet GeneratePlanetScript(GameObject _planetObj, PlanetSettings _planet)
+    {
+        Planet _planetScript = _planetObj.AddComponent<Planet>();
+        //set the planet radius
+        _planetScript.planetRadius = _planet.planetRadius;
+        //get planet mass
+        float _planetMass = _planet.planetMass;
+
+        return _planetScript;
     }
 
     //destroy all gameobjects tagged as "Planets"

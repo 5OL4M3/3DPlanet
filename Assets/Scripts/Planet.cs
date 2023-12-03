@@ -27,15 +27,19 @@ public class Planet : MonoBehaviour
 
     [SerializeField]
     [HideInInspector]
-    MeshFilter[] meshFilters;
+    //MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
 
     public int PlanetSplitCount = 2;
 
     //public int PlanetMeshCount = 24;
 
-    MeshFilter[] oceanFilters;
+    //MeshFilter[] oceanFilters;
     TerrainFace[] oceanFaces;
+
+    //-----------------
+    //Parameters from SolarSystemGenerator
+    public float planetRadius = 50;
 
 
 
@@ -45,12 +49,21 @@ public class Planet : MonoBehaviour
 
         shapeGenerator = new ShapeGenerator(shapeSettings);
 
-        _checkIfValid(_PlanetSplitCount);
         TerrainFace[] _terrainFaces = new TerrainFace[PlanetMeshCount];
         MeshFilter[] _meshFilters = new MeshFilter[PlanetMeshCount];
         int meshesPerFace = _PlanetSplitCount * _PlanetSplitCount;
 
         Vector3[] directions = { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
+
+        //create parent gameobject for meshes
+        GameObject meshObjParent = new GameObject("meshes");
+        meshObjParent.transform.parent = transform;
+        meshObjParent.transform.localPosition = Vector3.zero;
+        
+
+        //(1,1,1) is about 50 in absolute scale
+        meshObjParent.transform.localScale = new Vector3(planetRadius / 50, planetRadius / 50, planetRadius / 50);
+        Debug.Log("meshObjParent: " + meshObjParent + " scale: " + meshObjParent.transform.localScale);
 
         //create gameobjects for meshes
         for (int i = 0; i < PlanetMeshCount; i++)
@@ -58,7 +71,7 @@ public class Planet : MonoBehaviour
             if (_meshFilters[i] == null)
             {
                 GameObject meshObj = new GameObject("mesh");
-                meshObj.transform.parent = transform;
+                meshObj.transform.parent = meshObjParent.transform;
 
                 meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                 _meshFilters[i] = meshObj.AddComponent<MeshFilter>();
@@ -108,7 +121,7 @@ public class Planet : MonoBehaviour
         //check for old meshes in children, delete if name includes "planetmesh" or "oceanmesh"
         foreach (Transform child in transform)
         {
-            if (child.name.Contains("planetmesh") || child.name.Contains("oceanmesh"))
+            if (child.name.Contains("planetmesh") || child.name.Contains("oceanmesh") || child.name.Contains("meshes"))
             {
                 DestroyImmediate(child.gameObject);
             }
@@ -221,38 +234,6 @@ public class Planet : MonoBehaviour
         {
             Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
             mat.color = Random.ColorHSV();
-        }
-    }
-
-    [SerializeField]
-    [Button]
-    public void _checkIfValid(int _PlanetSplitCount)
-    {
-        int PlanetMeshCount = _PlanetSplitCount * _PlanetSplitCount * 6;
-        //refresh meshFilters
-        meshFilters = new MeshFilter[PlanetMeshCount];
-        oceanFilters = new MeshFilter[6];
-        for (int i = 0; i < PlanetMeshCount; i++)
-        {
-            meshFilters[i] = null;
-        }
-
-        for (int i = 0; i < 6; i++)
-        {
-            oceanFilters[i] = null;
-        }
-        
-        //refresh terrainFaces
-        terrainFaces = new TerrainFace[PlanetMeshCount];
-        oceanFaces = new TerrainFace[6];
-        for (int i = 0; i < PlanetMeshCount; i++)
-        {
-            terrainFaces[i] = null;
-        }
-        for (int i = 0; i < 6; i++)
-        {
-            terrainFaces[i] = null;
-            oceanFaces[i] = null;
         }
     }
 

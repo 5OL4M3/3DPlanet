@@ -81,6 +81,7 @@ public class SolarSystemPlanner : MonoBehaviour
             planetSettings.planetTemperature = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.planetMoons = Random.Range(0, 2);
             planetSettings.planetOrbit = Random.Range(10, 40) + Random.Range(-10, 10);
+            planetSettings.planetOrbitSpeedSelf = Random.Range(10, 40) + Random.Range(-10, 10);
             planetSettings.planetOrbitSpeed = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.minDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.maxDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
@@ -144,6 +145,7 @@ public class SolarSystemPlanner : MonoBehaviour
             planetSettings.planetTemperature = Random.Range(defPlanet.planetTemperatureBaseMin, defPlanet.planetTemperatureBaseMax) + Random.Range(-defPlanet.planetTemperatureVarience, defPlanet.planetTemperatureVarience);
             planetSettings.planetOrbit = Random.Range(defPlanet.planetOrbitBaseMin, defPlanet.planetOrbitBaseMax) + Random.Range(-defPlanet.planetOrbitVarience, defPlanet.planetOrbitVarience);
             planetSettings.planetOrbitSpeed = Random.Range(defPlanet.planetOrbitSpeedBaseMin, defPlanet.planetOrbitSpeedBaseMax) + Random.Range(-defPlanet.planetOrbitSpeedVarience, defPlanet.planetOrbitSpeedVarience);
+            planetSettings.planetOrbitSpeedSelf = Random.Range(defPlanet.planetOrbitSpeedSelfBaseMin, defPlanet.planetOrbitSpeedSelfBaseMax) + Random.Range(-defPlanet.planetOrbitSpeedSelfVarience, defPlanet.planetOrbitSpeedSelfVarience);
             planetSettings.DistanceFromStar = Random.Range(defPlanet.DistanceFromStarBaseMin, defPlanet.DistanceFromStarBaseMax) + Random.Range(-defPlanet.DistanceFromStarVarience, defPlanet.DistanceFromStarVarience);
             planetSettings.minDistanceBetweenMoons = defPlanet.minDistanceBetweenMoonsBaseMin;
             planetSettings.maxDistanceBetweenMoons = defPlanet.minDistanceBetweenMoonsBaseMax;
