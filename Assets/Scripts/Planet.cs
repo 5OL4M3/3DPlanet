@@ -59,11 +59,9 @@ public class Planet : MonoBehaviour
         GameObject meshObjParent = new GameObject("meshes");
         meshObjParent.transform.parent = transform;
         meshObjParent.transform.localPosition = Vector3.zero;
+        meshObjParent.transform.localScale = Vector3.one;
         
 
-        //(1,1,1) is about 50 in absolute scale
-        meshObjParent.transform.localScale = new Vector3(planetRadius / 50, planetRadius / 50, planetRadius / 50);
-        Debug.Log("meshObjParent: " + meshObjParent + " scale: " + meshObjParent.transform.localScale);
 
         //create gameobjects for meshes
         for (int i = 0; i < PlanetMeshCount; i++)
@@ -136,6 +134,8 @@ public class Planet : MonoBehaviour
         GenerateOcean(mfocean);
         //GenerateColors(mfland, colorSettings.planetColor);
         GenerateColors(mfocean, Color.blue);
+        ScalePlanetDownToNormalSizeMF(mfland);
+        ScalePlanetDownToNormalSizeMF(mfocean);
 
         setToRandomMeshColors(mfland);
         //subDivideMeshes(meshFilters);
@@ -160,6 +160,26 @@ public class Planet : MonoBehaviour
             GeneratePlanet(PlanetSplitCount);
         }
     }
+
+    private void ScalePlanetDownToNormalSizeTF(TerrainFace[] _tf)
+    {
+        //scale down to normal size
+        //float scaleDown = 0.5f;
+        //foreach (TerrainFace tf in _tf)
+        //{
+        //    tf.transform.localScale = new Vector3(scaleDown, scaleDown, scaleDown);
+        //}
+    }
+    private void ScalePlanetDownToNormalSizeMF(MeshFilter[] _mf)
+    {
+        //scale down to normal size
+        float scaleDown = 0.02f;
+        foreach (MeshFilter mf in _mf)
+        {
+            mf.transform.localScale = new Vector3(scaleDown, scaleDown, scaleDown);
+        }
+    }
+
 
     MeshFilter[] GenerateMesh(MeshFilter[] _meshFilters, int _PlanetSplitCount)
     {   

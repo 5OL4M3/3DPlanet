@@ -8,7 +8,7 @@ public class PlanetRotate : MonoBehaviour
     public float RotateSpeed;
     public float RotateSpeedSelf;
     public float DistanceFromStar;
-    public float PlanetRadius;
+    //public float PlanetRadius;
     private GlobalVars globalSettings;
 
     // Start is called before the first frame update

@@ -47,7 +47,7 @@ public class SolarSystemGenerator : MonoBehaviour
             GameObject _planetObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             _planetObj.name = "Planet" + _planet.DistanceFromStar;
             //divide radius by 5
-            float _planetRadius = _planet.planetRadius / 5;
+            float _planetRadius = _planet.planetRadius / 10;
 
             //multiply distance by 2
             float _planetDistance = _planet.DistanceFromStar * 2;
@@ -80,6 +80,9 @@ public class SolarSystemGenerator : MonoBehaviour
             //assign a planet script to the planet
             Planet _planetScript = GeneratePlanetScript(_planetObj, _planet);
 
+            //assign an atmosphere to the planet
+            AttachAtmosphereToGO(_planetObj, _planet);
+
             _planetCount++;
         }
 
@@ -111,7 +114,7 @@ public class SolarSystemGenerator : MonoBehaviour
         //set the distance from the star
         _planetRotate.DistanceFromStar = _planet.DistanceFromStar;
         //set the planet radius
-        _planetRotate.PlanetRadius = _planet.planetRadius;
+        //_planetRotate.PlanetRadius = _planet.planetRadius;
         //set the planet rotation speed
         _planetRotate.RotateSpeedSelf = _planet.planetOrbitSpeedSelf;
         return _planetRotate;
@@ -126,6 +129,25 @@ public class SolarSystemGenerator : MonoBehaviour
         float _planetMass = _planet.planetMass;
 
         return _planetScript;
+    }
+
+    private void AttachAtmosphereToGO(GameObject _planetObj, PlanetSettings _planet)
+    {
+        //create atmosphere
+        GameObject _atmosphereObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        _atmosphereObj.name = "Atmosphere" + _planet.DistanceFromStar;
+        //parent atmosphere to planet
+        
+        float _atmosphereScale = _planet.planetRadius / 20;
+        _atmosphereObj.transform.localScale = _planetObj.transform.localScale * 1.10f;
+        _atmosphereObj.transform.parent = _planetObj.transform;
+        //set position to planet position
+        _atmosphereObj.transform.position = _planetObj.transform.position;
+        //set atmosphere material to "MatAtmosphere" in the assets folder
+        _atmosphereObj.GetComponent<Renderer>().material = Resources.Load("MatAtmosphere") as Material;
+        //scale ScaleMultiply by planet radius and set material parameter
+        _atmosphereObj.GetComponent<Renderer>().sharedMaterial.SetFloat("_ScaleMultiply", (1 + (_atmosphereScale * 0.7f)));
+        
     }
 
     //destroy all gameobjects tagged as "Planets"
