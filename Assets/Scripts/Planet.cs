@@ -40,6 +40,19 @@ public class Planet : MonoBehaviour
     //-----------------
     //Parameters from SolarSystemGenerator
     public float planetRadius = 50;
+    //biome probability
+
+    //bit of a hack but whatever
+    private enum _BiomesPlanets
+    {
+        Desert,
+        Forest,
+        Tundra,
+        Mountain,
+        Barren,
+        None
+    }
+    public List<(int, float)> biomeProbabilities = new List<(int, float)>();
 
 
 
@@ -137,7 +150,8 @@ public class Planet : MonoBehaviour
         ScalePlanetDownToNormalSizeMF(mfland);
         ScalePlanetDownToNormalSizeMF(mfocean);
 
-        setToRandomMeshColors(mfland);
+        setToBiomesDebug(mfland);
+        debugPrintBiomesProbs();
         //subDivideMeshes(meshFilters);
         //GenerateColors(newMeshFilters);
     }
@@ -256,5 +270,145 @@ public class Planet : MonoBehaviour
             mat.color = Random.ColorHSV();
         }
     }
+
+    void setToBiomesDebug(MeshFilter[] mfs)
+    {
+        if (mfs == null || mfs.Length == 0)
+        {
+            return;
+        }
+
+        //get the distance from the center of the planet as height, min and max
+        float minHeight = 100;
+        float maxHeight = 0;
+        //get min and max heights
+        float minAvgHeightPolar = 10000;
+        float maxAvgHeightPolar = 0;
+        foreach (MeshFilter filter in mfs)
+        {
+            //get average height of mesh by getting all y values, clamping to (0,100) and averaging
+            Mesh mesh = filter.sharedMesh;
+            Vector3[] vertices = mesh.vertices;
+            float AvgWorldheight = 0;
+            Vector3 WorldPlanetCenter = transform.position;
+            foreach (Vector3 vertex in vertices)
+            {
+                float wheight = vertex.y;
+                AvgWorldheight += wheight;
+
+                //get sphereical heights
+                float distanceFromCenter = Vector3.Distance(vertex, WorldPlanetCenter);
+                float height = distanceFromCenter - planetRadius;
+                height = Mathf.Clamp(height, -10, 150);
+                if (height < minHeight)
+                {
+                    minHeight = height;
+                }
+                if (height > maxHeight)
+                {
+                    maxHeight = height;
+                }
+            }
+            AvgWorldheight /= vertices.Length;
+            //Debug.Log("MESH1 Avg world height: " + AvgWorldheight);
+            if (AvgWorldheight < minAvgHeightPolar)
+            {
+                //Debug.Log("MESH1 Avg world height: " + AvgWorldheight + " is less than minHeight: " + minAvgHeightPolar);
+                minAvgHeightPolar = AvgWorldheight;
+            }
+            if (AvgWorldheight > maxAvgHeightPolar)
+            {
+                //Debug.Log("MESH1 Avg world height: " + AvgWorldheight + " is greater than maxHeight: " + maxAvgHeightPolar);
+                maxAvgHeightPolar = AvgWorldheight;
+            }
+        }
+        Debug.Log("Min height: " + minHeight + " Max height: " + maxHeight);
+        Debug.Log("MinMax avg height: " + minAvgHeightPolar + " Max avg height: " + maxAvgHeightPolar);
+        Debug.Log("Number of meshes: " + mfs.Length);
+        foreach (MeshFilter filter in mfs)
+        {
+            //get average world height and average spherical height
+            Mesh mesh = filter.sharedMesh;
+            Vector3[] vertices = mesh.vertices;
+            float sphereheight = 0;
+            float worldheight = 0;
+            Vector3 WorldPlanetCenter = transform.position;
+            foreach (Vector3 vertex in vertices)
+            {
+                float wheight = vertex.y;
+                worldheight += wheight;
+
+                //get sphereical heights
+                float distanceFromCenter = Vector3.Distance(vertex, WorldPlanetCenter);
+                float height = distanceFromCenter - planetRadius;
+                sphereheight += Mathf.Clamp(height, -10, 150);
+            }
+            worldheight /= vertices.Length;
+            sphereheight /= vertices.Length;
+            //normalize sphere height between 0 and 1
+            sphereheight = (sphereheight - minHeight) / (maxHeight - minHeight);
+            Debug.Log("MESH Avg world height: " + worldheight + " Avg spherical height: " + sphereheight);
+
+            bool isPolarCap = false;
+            if (worldheight < minAvgHeightPolar + 0.1f || worldheight > maxAvgHeightPolar - 0.1f)
+            {
+                isPolarCap = true;
+            }
+
+            bool isFlat = false;
+            bool isRough = false;
+            //flat, rough, or inbetween
+            if (sphereheight < 0.3f)
+            {
+                isFlat = true;
+            }
+            else if (sphereheight > 0.7f)
+            {
+                isRough = true;
+            }
+            else
+            {
+                isFlat = false;
+                isRough = false;
+            }
+            Debug.Log("isPolarCap: " + isPolarCap + " isFlat: " + isFlat + " isRough: " + isRough + " sphereheight: " + sphereheight + " minHeight: " + minHeight + " maxHeight: " + maxHeight);
+
+            //color white if polar cap, blue if flat, green if rough, red if inbetween
+            if (isPolarCap)
+            {
+                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+                mat.color = Color.white;
+            }
+            else if (isFlat)
+            {
+                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+                mat.color = Color.gray;
+            }
+            else if (isRough)
+            {
+                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+                mat.color = Color.green;
+            }
+            else
+            {
+                Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
+                mat.color = Color.red;
+            }
+        }
+    }
+
+
+
+
+
+    void debugPrintBiomesProbs()
+    {
+        foreach ((int, float) biome in biomeProbabilities)
+        {
+            _BiomesPlanets biomeName = (_BiomesPlanets)biome.Item1;
+            Debug.Log("Biome: " + biomeName + " Probability: " + biome.Item2);
+        }
+    }
+
 
 }

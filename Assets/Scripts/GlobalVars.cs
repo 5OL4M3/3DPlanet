@@ -4,7 +4,7 @@ using UnityEngine;
 using NaughtyAttributes;
 
 [System.Serializable]
-public class GlobalVars 
+public class GlobalVars
 {
     // Global script for storing global variables
     public int seed = 42;
@@ -112,6 +112,18 @@ public class PlanetSettings
     public float DistanceFromStar = 1;
 
     public List<MoonSettings> moons = new List<MoonSettings>();
+
+    public enum BiomesPlanets
+    {
+        Desert,
+        Forest,
+        Tundra,
+        Mountain,
+        Barren,
+        None
+    }
+    public List<(int, float)> Biomes = new List<(int, float)>();
+
 }
 
 [System.Serializable]
@@ -169,3 +181,4 @@ public class SolarSystemPlan
     public List<PlanetSettings> planets = new List<PlanetSettings>();
     public StarSettings star = new StarSettings();
 }
+

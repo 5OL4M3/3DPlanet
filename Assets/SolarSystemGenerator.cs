@@ -127,6 +127,16 @@ public class SolarSystemGenerator : MonoBehaviour
         _planetScript.planetRadius = _planet.planetRadius;
         //get planet mass
         float _planetMass = _planet.planetMass;
+        //get planet temperature
+        float _planetTemperature = _planet.planetTemperature;
+        //Create list if tuples for biomes probabilities
+        _planet.Biomes = new List<(int, float)>();
+        //add biomes to list
+        _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Desert, 0.2f));
+
+        _planetScript.biomeProbabilities = _planet.Biomes;
+
+        
 
         return _planetScript;
     }
