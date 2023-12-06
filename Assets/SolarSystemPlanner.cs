@@ -57,6 +57,9 @@ public class SolarSystemPlanner : MonoBehaviour
     [Button]
     private void GenerateRandomSolarSystemPlan()
     {
+        RefreshSettings();
+
+        
         ResetRandomSeed();
         solarSystemPlan = new SolarSystemPlan();
         int seed = Random.Range(0, 1000000);
@@ -66,6 +69,7 @@ public class SolarSystemPlanner : MonoBehaviour
         starSettings.starRadius = Random.Range(20, 80) + Random.Range(-20, 20);
         starSettings.starMass = Random.Range(20, 80) + Random.Range(-20, 20);
         starSettings.starTemperature = Random.Range(20, 80) + Random.Range(-20, 20);
+        starSettings.name = "Sol";
         solarSystemPlan.star = starSettings;
 
         int numberOfPlanets = Random.Range(1, 10);
@@ -87,6 +91,7 @@ public class SolarSystemPlanner : MonoBehaviour
             planetSettings.maxDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.VarDistanceBetweenMoons = Random.Range(20, 80) + Random.Range(-20, 20);
             planetSettings.DistanceFromStar = Random.Range(40, 200) + Random.Range(-20, 20);
+            planetSettings.name = "Planet " + starSettings.name + " " + _generateRomanNumeral(i+1);
 
             int numberOfMoons = Random.Range(0, 10);
             for (int j = 0; j < numberOfMoons; j++)
@@ -102,6 +107,7 @@ public class SolarSystemPlanner : MonoBehaviour
                 moonSettings.moonOrbit = Random.Range(20, 80) + Random.Range(-20, 20);
                 moonSettings.moonOrbitSpeed = Random.Range(20, 80) + Random.Range(-20, 20);
                 moonSettings.DistanceFromPlanet = Random.Range(20, 80) + Random.Range(-20, 20);
+                moonSettings.name = "Moon " + planetSettings.name + " " + _generateRomanNumeral(j+1);
                 planetSettings.moons.Add(moonSettings);
             }
             //sort moons by distance from planet
@@ -116,6 +122,10 @@ public class SolarSystemPlanner : MonoBehaviour
     [Button]
     private void GenerateSolarSystemPlanFromGlobalSettings()
     {
+        RefreshSettings();
+
+
+        //generate star stuff
         DefaultStarSettings defStar = globalSettings.defaultStarSettings;
         DefaultPlanetSettings defPlanet = globalSettings.defaultPlanetSettings;
         DefaultMoonSettings defMoon = globalSettings.defaultMoonSettings;
@@ -129,7 +139,9 @@ public class SolarSystemPlanner : MonoBehaviour
         starSettings.starRadius = Random.Range(defStar.starRadiusBaseMin, defStar.starRadiusBaseMax) + Random.Range(-defStar.starRadiusVarience, defStar.starRadiusVarience);
         starSettings.starMass = Random.Range(defStar.starMassBaseMin, defStar.starMassBaseMax) + Random.Range(-defStar.starMassVarience, defStar.starMassVarience);
         starSettings.starTemperature = Random.Range(defStar.starTemperatureBaseMin, defStar.starTemperatureBaseMax) + Random.Range(-defStar.starTemperatureVarience, defStar.starTemperatureVarience);
+        starSettings.name = _generateStarSolarSystemName();
         solarSystemPlan.star = starSettings;
+
         float numberOfPlanetsFloat = Random.Range(defPlanet.AveragePlanets - defPlanet.PlanetVarience, defPlanet.AveragePlanets + defPlanet.PlanetVarience);
         int numberOfPlanets = Mathf.RoundToInt(numberOfPlanetsFloat);
         Debug.Log("Number of planets: " + numberOfPlanets);
@@ -150,6 +162,7 @@ public class SolarSystemPlanner : MonoBehaviour
             planetSettings.minDistanceBetweenMoons = defPlanet.minDistanceBetweenMoonsBaseMin;
             planetSettings.maxDistanceBetweenMoons = defPlanet.minDistanceBetweenMoonsBaseMax;
             planetSettings.VarDistanceBetweenMoons = defPlanet.minDistanceBetweenMoonsVarience;
+            planetSettings.name = "Planet " + starSettings.name + " " + _generateRomanNumeral(i+1);
 
             float AverageMoons = Random.Range(defPlanet.AverageMoons - defPlanet.MoonVarience, defPlanet.AverageMoons + defPlanet.MoonVarience);
             float MoonVarience = defPlanet.MoonVarience;
@@ -172,6 +185,7 @@ public class SolarSystemPlanner : MonoBehaviour
                 moonSettings.moonOrbit = Random.Range(defMoon.moonOrbitBaseMin, defMoon.moonOrbitBaseMax) + Random.Range(-defMoon.moonOrbitVarience, defMoon.moonOrbitVarience);
                 moonSettings.moonOrbitSpeed = Random.Range(defMoon.moonOrbitSpeedBaseMin, defMoon.moonOrbitSpeedBaseMax) + Random.Range(-defMoon.moonOrbitSpeedVarience, defMoon.moonOrbitSpeedVarience);
                 moonSettings.DistanceFromPlanet = Random.Range(defMoon.DistanceFromPlanetBaseMin, defMoon.DistanceFromPlanetBaseMax) + Random.Range(-defMoon.DistanceFromPlanetVarience, defMoon.DistanceFromPlanetVarience);
+                moonSettings.name = "Moon " + planetSettings.name + " " + _generateRomanNumeral(j+1);
                 planetSettings.moons.Add(moonSettings);
                 //sort moons by distance from planet
                 planetSettings.moons.Sort((x, y) => x.DistanceFromPlanet.CompareTo(y.DistanceFromPlanet));
@@ -188,6 +202,8 @@ public class SolarSystemPlanner : MonoBehaviour
     [Button]
     private void RefreshSettings()
     {
+        ClearSolarSystemPlan();
+        ClearLoadedSettings();
         //grab from "settings" tag
             GameObject[] settings = GameObject.FindGameObjectsWithTag("Settings");
             if (settings.Length == 0)
@@ -213,14 +229,12 @@ public class SolarSystemPlanner : MonoBehaviour
     }
 
     //clear the solar system plan
-    [Button]
     private void ClearSolarSystemPlan()
     {
         solarSystemPlan = new SolarSystemPlan();
     }
 
     //Clear loaded Settings
-    [Button]
     private void ClearLoadedSettings()
     {
         globalSettings = new GlobalVars();
@@ -281,5 +295,30 @@ public class SolarSystemPlanner : MonoBehaviour
     private void SetRandomSeedToNumber(int seed)
     {
         Random.InitState(seed);
+    }
+
+    //generate star name from list
+    private string _generateStarSolarSystemName()
+    {
+        List<string> _starNames = new List<string> { "Sol", "Alpha Centauri", "Barnard's Star", "Wolf 359", "Lalande 21185", "Sirius", "Luyten 726-8", "Ross 154", "Ross 248", "Epsilon Eridani", "Lacaille 9352", "Ross 128", "EZ Aquarii", "Procyon", "61 Cygni", "Struve 2398", "Groombridge 34 A", "DX Cancri", "Tau Ceti", "Epsilon Indi", "YZ Ceti", "Luyten's Star", "Teegarden's Star", "SCR 1845-6357", "WISE 0855-0714", "WISE 1541-2250", "WISE 0350-5658", "WISE 0410+1502", "WISE 1405+5534", "WISE 1506+7027", "WISE 1639-6847", "WISE 1828+2650", "WISE 2056+1459", "WISE 2359-7335", "WISE 0458+6434", "WISE 0720-0846", "WISE 0855-0714", "WISE 1541-2250", "WISE 0350-5658", "WISE 0410+1502", "WISE 1405+5534", "WISE 1506+7027", "WISE 1639-6847", "WISE 1828+2650", "WISE 2056+1459", "WISE 2359-7335", "WISE 0458+6434", "WISE 0720-0846" };
+        _starNames.Add("Gulaegawa");
+        _starNames.Add("Gindauhiri");
+        _starNames.Add("Inneon");
+        _starNames.Add("Kenroria");
+        _starNames.Add("Eotera");
+        _starNames.Add("Zerilia");
+        _starNames.Add("Nethugawa");
+        _starNames.Add("Ciatania");
+        _starNames.Add("Chyke ER8E");
+        _starNames.Add("Nichi 5W2");
+        int _starNameIndex = Random.Range(0, _starNames.Count);
+        return _starNames[_starNameIndex];
+    }
+
+    //generate roman numeral from number (1-10)
+    private string _generateRomanNumeral(int number)
+    {
+        string[] _romanNumerals = new string[] { "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X" };
+        return _romanNumerals[number - 1];
     }
 }

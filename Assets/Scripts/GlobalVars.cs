@@ -31,6 +31,7 @@ public class DefaultStarSettings
     public float starTemperatureVarience = 20;
     public float starTemperatureBaseMin = 20;
     public float starTemperatureBaseMax = 80;
+    public string name = "Solar System";
 }
 
 [System.Serializable]
@@ -43,6 +44,7 @@ public class StarSettings
     public float starMass = 1;
 
     public float starTemperature = 1;
+    public string name = "Solar System";
 }
 
 [System.Serializable]
@@ -85,6 +87,8 @@ public class DefaultPlanetSettings
 
     public float AveragePlanets = 4;
     public float PlanetVarience = 2;
+
+    public string name = "Planet";
 }
 
 [System.Serializable]
@@ -124,6 +128,8 @@ public class PlanetSettings
     }
     public List<(int, float)> Biomes = new List<(int, float)>();
 
+    public string name = "Planet";
+
 }
 
 [System.Serializable]
@@ -153,6 +159,8 @@ public class DefaultMoonSettings
     public float DistanceFromPlanetVarience = 20;
     public float DistanceFromPlanetBaseMin = 20;
     public float DistanceFromPlanetBaseMax = 80;
+
+    public string name = "Moon";
 }
 
 [System.Serializable]
@@ -171,6 +179,8 @@ public class MoonSettings
     public float moonOrbitSpeed = 1;
 
     public float DistanceFromPlanet = 1;
+
+    public string name = "Moon";
 }
 
 
@@ -180,5 +190,7 @@ public class SolarSystemPlan
 {
     public List<PlanetSettings> planets = new List<PlanetSettings>();
     public StarSettings star = new StarSettings();
+
+    
 }
 

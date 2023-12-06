@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
+using TMPro;
+using System.Globalization;
 
 public class StaticCameraControl : MonoBehaviour
 {
+    [SerializeField] private GameObject tmpTextIndicator;
     private Transform target;
     public Transform sun;
     private float zoomVal;
@@ -11,6 +15,7 @@ public class StaticCameraControl : MonoBehaviour
     private int iteration = 0;
     public Vector3 birdEyeDirection = new Vector3(5f, 2f, 0f);
     public float birdEyeZoomVal = 450;
+    public float zoomSensitivity = 3.5f;
 
     private List<GameObject> observablePlanets = new List<GameObject>();
 
@@ -24,7 +29,7 @@ public class StaticCameraControl : MonoBehaviour
             {
                 // This GameObject has "planet" in its name
                 observablePlanets.Add(obj);
-                Debug.Log("Found planet: " + obj.name);
+                //Debug.Log("Found planet: " + obj.name);
             }
         }
 
@@ -34,13 +39,17 @@ public class StaticCameraControl : MonoBehaviour
         transform.position = target.position + (zoomVal) * direction.normalized;
 
         birdEyeZoomVal = 450;
-        Debug.Log("HOW MANY PLANETS: " + observablePlanets.Count);
+        //Debug.Log("HOW MANY PLANETS: " + observablePlanets.Count);
+
+        //set start to sun
+        target = sun;
     }
 
     void Update()
     {
         HandleTargetSwap();
         HandleMouseScroll();
+        _updateTMPTextIndicator();
 
         if (target.gameObject.name.ToLower().Contains("sun"))
         {
@@ -88,6 +97,34 @@ public class StaticCameraControl : MonoBehaviour
         }
     }
 
+    private void _updateTMPTextIndicator()
+    {
+        TextMeshProUGUI _tmp = tmpTextIndicator.GetComponent<TextMeshProUGUI>();
+        string _currentTransformName = _getCurrentTransformName();
+        _tmp.text = _currentTransformName;
+    }
+
+    private string _getCurrentTransformName()
+    {
+        //if sun, grab a planet and return only the planet name, we can avoid using a solar system plan
+        string name = target.gameObject.name;
+        if (name.ToLower().Contains("sun"))
+        {
+            name = observablePlanets[0].name;
+            //trim numerals from end by breaking at first space 
+            name = name.Split(' ')[1];
+            Debug.Log("Name: " + name);
+        }
+        //remove "sun" and "planet" from name, correct formatting
+        name = name.Replace("Sun", "");
+        name = name.Replace("Planet", "");
+        name = name.Trim();
+        //name = name.ToLower();
+        TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+        name = textInfo.ToTitleCase(name);
+        return name;
+    }
+
     void HandleMouseScroll()
     {
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
@@ -95,7 +132,7 @@ public class StaticCameraControl : MonoBehaviour
         
         if (scrollInput != 0.0f)
         {
-            zoomVal += (scrollInput) * 2.0f;
+            zoomVal += (scrollInput) * zoomSensitivity;
 
             //Debug.Log(zoomVal);
             //Debug.Log("UP");
@@ -118,13 +155,13 @@ public class StaticCameraControl : MonoBehaviour
         {
             target = observablePlanets[iteration].transform;
             iteration += 1;
-            Debug.Log("E Pressed: " + target.gameObject.name);
+            //Debug.Log("E Pressed: " + target.gameObject.name);
         }
         else if (Input.GetKeyDown(KeyCode.Q))
         {
             target = observablePlanets[iteration].transform;
             iteration -= 1;
-            Debug.Log("Q Pressed: " + target.gameObject.name);
+            //Debug.Log("Q Pressed: " + target.gameObject.name);
         }
     }
 }

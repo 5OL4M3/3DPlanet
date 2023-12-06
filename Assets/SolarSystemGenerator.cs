@@ -6,6 +6,9 @@ using DTT.Utils;
 
 public class SolarSystemGenerator : MonoBehaviour
 {
+    [SerializeField]
+    public ShapeSettings shapeSettings;
+
     private SolarSystemPlan setsolarSystemPlan;
 
     //set the solar system plan held in the solar system plan script
@@ -13,12 +16,11 @@ public class SolarSystemGenerator : MonoBehaviour
     {
         //get the solar system planner script in the same game object
         SolarSystemPlanner scriptobj = GetComponent<SolarSystemPlanner>();
-        Debug.Log("Solar System Plan: " + scriptobj.solarSystemPlan);
+        //Debug.Log("Solar System Plan: " + scriptobj.solarSystemPlan);
         setsolarSystemPlan = scriptobj.solarSystemPlan;
     }
 
     //reset the solar system plan held in the solar system plan script
-    [Button]
     public void DebugResetSolarSystemPlan()
     {
         SolarSystemPlanner _scriptobj = GetComponent<SolarSystemPlanner>();
@@ -26,7 +28,6 @@ public class SolarSystemGenerator : MonoBehaviour
     }
 
     //Read the solar system plan held in the solar system plan script for number of planets and print them
-    [Button]
     public void DebugReadSolarSystemPlan()
     {
         List<PlanetSettings> _planetSettings = setsolarSystemPlan.planets;
@@ -38,14 +39,24 @@ public class SolarSystemGenerator : MonoBehaviour
 
     //generate gameobjects for each planet in the solar system plan held in the solar system plan script
     [Button]
-    public void DebugGenerateSolarSystem()
+    public void GenerateSolarSystem()
     {
+        //reset settings
+        DebugResetSolarSystemPlan();
+        //destroy all gameobjects tagged as "Planets"
+        DestroySolarSystem();
+
+
         List<PlanetSettings> _planetSettings = setsolarSystemPlan.planets;
         int _planetCount = 1;
         foreach (PlanetSettings _planet in _planetSettings)
         {
-            GameObject _planetObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            _planetObj.name = "Planet" + _planet.DistanceFromStar;
+            //create empty gameobject
+            GameObject _planetObj = new GameObject();
+
+
+
+            _planetObj.name = _planetSettings[_planetCount - 1].name;
             //divide radius by 5
             float _planetRadius = _planet.planetRadius / 10;
 
@@ -82,6 +93,12 @@ public class SolarSystemGenerator : MonoBehaviour
 
             //assign an atmosphere to the planet
             AttachAtmosphereToGO(_planetObj, _planet);
+
+            //assign shape settings to the planet script
+            _planetScript.shapeSettings = shapeSettings;
+
+            //trigger the planet to generate
+            _planetScript.GeneratePlanet(_planetScript.PlanetSplitCount);
 
             _planetCount++;
         }
@@ -148,7 +165,7 @@ public class SolarSystemGenerator : MonoBehaviour
         _atmosphereObj.name = "Atmosphere" + _planet.DistanceFromStar;
         //parent atmosphere to planet
         
-        float _atmosphereScale = _planet.planetRadius / 20;
+        float _atmosphereScale = _planet.planetRadius / 300;
         _atmosphereObj.transform.localScale = _planetObj.transform.localScale * 1.10f;
         _atmosphereObj.transform.parent = _planetObj.transform;
         //set position to planet position
@@ -162,14 +179,17 @@ public class SolarSystemGenerator : MonoBehaviour
 
     //destroy all gameobjects tagged as "Planets"
     [Button]
-    public void DebugDestroySolarSystem()
+    public void DestroySolarSystem()
     {
+        DebugResetSolarSystemPlan();
         GameObject[] _planets = GameObject.FindGameObjectsWithTag("Planets");
         foreach (GameObject _planet in _planets)
         {
             DestroyImmediate(_planet);
         }
     }
+
+    
 
     
 }

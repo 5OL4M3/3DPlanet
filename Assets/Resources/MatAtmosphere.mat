@@ -83,7 +83,7 @@ Material:
     m_Floats:
     - _AlphaClip: 1
     - _AlphaToMask: 0
-    - _AnimSpeed: 6
+    - _AnimSpeed: 62.62
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -106,9 +106,9 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Scale1: 0.12
-    - _Scale2: 0.36
-    - _ScaleMultiply: 4.8039703
+    - _Scale1: 3
+    - _Scale2: 11
+    - _ScaleMultiply: 1.3043176
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
