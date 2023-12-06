@@ -11,7 +11,6 @@ public class Planet : MonoBehaviour
     public int resolution = 96;
 
     public ShapeSettings shapeSettings;
-    public ColorSettings colorSettings;
     public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back };
     public FaceRenderMask faceRenderMask;
 
@@ -20,8 +19,6 @@ public class Planet : MonoBehaviour
 
     [HideInInspector]
     public bool shapeSettingsFold;
-    [HideInInspector]
-    public bool colorSettingsFold;
 
     ShapeGenerator shapeGenerator;
 
@@ -132,7 +129,7 @@ public class Planet : MonoBehaviour
         //check for old meshes in children, delete if name includes "planetmesh" or "oceanmesh"
         foreach (Transform child in transform)
         {
-            if (child.name.Contains("planetmesh") || child.name.Contains("oceanmesh") || child.name.Contains("meshes"))
+            if (child.name.Contains("submesh") || child.name.Contains("oceanmesh") || child.name.Contains("meshes"))
             {
                 DestroyImmediate(child.gameObject);
             }
@@ -145,15 +142,12 @@ public class Planet : MonoBehaviour
         mfland = GenerateMesh(mfland, PlanetSplitCount);
         Initialize(out oceanFaces, out mfocean, 1);
         GenerateOcean(mfocean);
-        //GenerateColors(mfland, colorSettings.planetColor);
-        GenerateColors(mfocean, Color.blue);
         ScalePlanetDownToNormalSizeMF(mfland);
         ScalePlanetDownToNormalSizeMF(mfocean);
 
         setToBiomesDebug(mfland);
         debugPrintBiomesProbs();
         //subDivideMeshes(meshFilters);
-        //GenerateColors(newMeshFilters);
     }
 
 
@@ -194,7 +188,6 @@ public class Planet : MonoBehaviour
         }
     }
 
-
     MeshFilter[] GenerateMesh(MeshFilter[] _meshFilters, int _PlanetSplitCount)
     {   
         int PlanetMeshCount = _PlanetSplitCount * _PlanetSplitCount * 6;
@@ -210,7 +203,7 @@ public class Planet : MonoBehaviour
         {
             if (_meshFilters[i].gameObject.activeSelf)
             {
-                _meshFilters[i].gameObject.name = "planetmesh";
+                _meshFilters[i].gameObject.name = "submesh";
                 //position at 0 relative to parent
                 _meshFilters[i].gameObject.transform.localPosition = Vector3.zero;
             }
@@ -241,21 +234,14 @@ public class Planet : MonoBehaviour
             }
         }
 
-        return _meshFilters;
-
-    }
-
-    void GenerateColors(MeshFilter[] mfs, Color col)
-    {
-        if (mfs == null || mfs.Length == 0)
-        {
-            return;
-        }
-        foreach (MeshFilter filter in mfs)
+        //Change this script
+        foreach (MeshFilter filter in _meshFilters)
         {
             Material mat = filter.GetComponent<MeshRenderer>().sharedMaterial;
-            mat.color = col;
+            mat.color = Color.blue;
         }
+
+        return _meshFilters;
     }
 
     void setToRandomMeshColors(MeshFilter[] mfs)
