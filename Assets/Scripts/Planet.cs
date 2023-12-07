@@ -88,8 +88,6 @@ public class Planet : MonoBehaviour
         //set planet center
         TowardsPlanetCenter = transform.position;
         
-
-
         //create gameobjects for meshes
         for (int i = 0; i < PlanetMeshCount; i++)
         {
@@ -146,7 +144,7 @@ public class Planet : MonoBehaviour
         //check for old meshes in children, delete if name includes "planetmesh" or "oceanmesh"
         foreach (Transform child in transform)
         {
-            if (child.name.Contains("submesh") || child.name.Contains("ocean") || child.name.Contains("meshes"))
+            if (child.name.Contains("submesh") || child.name.Contains("ocean") || child.name.Contains("meshes") || child.name.Contains("plants"))
             {
                 DestroyImmediate(child.gameObject);
             }

@@ -12,50 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a64d951c6e4a4546b3f226f58776eea, type: 3}
   m_Name: Moon
   m_EditorClassIdentifier: 
-  planetRadius: 10
-  noiseLayers:
+  planetRadius: 10.84
+  terrianSetting:
   - enable: 1
-    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 0
-      simpleNoiseSettings:
-        strength: 0.03
-        numberLayers: 3
-        baseRoughness: 4
-        roughness: 1.7
-        persistence: 0.55
-        center: {x: 0, y: 0, z: 0}
-        minValue: 0.85
-      rigidNoiseSettings:
-        strength: 0.15
-        numberLayers: 4
-        baseRoughness: 2.52
-        roughness: 0.93
-        persistence: 0.75
-        center: {x: 0.44, y: 0, z: 0}
-        minValue: 0.86
-        weightMultiplier: -0.13
+      strength: 0.03
+      numberLayers: 3
+      baseRoughness: 4
+      roughness: 1.7
+      persistence: 0.55
+      center: {x: 0, y: 0, z: 0}
+      minValue: 0.61
+      weightMultiplier: 0
   - enable: 1
-    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 1
-      simpleNoiseSettings:
-        strength: 45.68
-        numberLayers: 3
-        baseRoughness: 7.5
-        roughness: 1.7
-        persistence: 0.55
-        center: {x: 0, y: 0, z: 0}
-        minValue: 0.85
-      rigidNoiseSettings:
-        strength: 0.15
-        numberLayers: 4
-        baseRoughness: 2.52
-        roughness: 0.93
-        persistence: 0.75
-        center: {x: 0.44, y: 0, z: 0}
-        minValue: 0.86
-        weightMultiplier: -0.13
+      strength: 0.15
+      numberLayers: 5
+      baseRoughness: 2.52
+      roughness: 0.93
+      persistence: 0.75
+      center: {x: 0.35, y: 0, z: 0}
+      minValue: 0.86
+      weightMultiplier: 0.4
   oceanSetting:
     enable: 0
     depth: -0.35

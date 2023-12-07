@@ -13,74 +13,44 @@ MonoBehaviour:
   m_Name: Shape
   m_EditorClassIdentifier: 
   planetRadius: 25
-  noiseLayers:
+  terrianSetting:
   - enable: 1
-    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 0
-      simpleNoiseSettings:
-        strength: 0.01
-        numberLayers: 4
-        baseRoughness: 2.3
-        roughness: 12.46
-        persistence: 0.46
-        center: {x: 0, y: -2.23, z: -0.06}
-        minValue: -0.18
-      rigidNoiseSettings:
-        strength: 0
-        numberLayers: 0
-        baseRoughness: 0
-        roughness: 0
-        persistence: 0
-        center: {x: 0, y: 0, z: 0}
-        minValue: 0
-        weightMultiplier: 0
+      strength: 0.01
+      numberLayers: 4
+      baseRoughness: 2.3
+      roughness: 12.46
+      persistence: 0.46
+      center: {x: 0, y: 0, z: 0}
+      minValue: 0.01
+      weightMultiplier: -0.39
   - enable: 1
-    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 1
-      simpleNoiseSettings:
-        strength: 0.66
-        numberLayers: 5
-        baseRoughness: 1.33
-        roughness: 3.06
-        persistence: 0.52
-        center: {x: -5.16, y: -2.23, z: -0.06}
-        minValue: 1
-      rigidNoiseSettings:
-        strength: 1.2
-        numberLayers: 6
-        baseRoughness: 0.14
-        roughness: 10
-        persistence: 0.19
-        center: {x: 0.63, y: 0, z: 0}
-        minValue: 1.09
-        weightMultiplier: 2.14
+      strength: 0.55
+      numberLayers: 7
+      baseRoughness: 0.2
+      roughness: 10
+      persistence: 0.35
+      center: {x: 2.46, y: 0.22, z: 0.73}
+      minValue: 1.16
+      weightMultiplier: 1.6
   - enable: 1
-    useFirstLayerAsMask: 0
     noiseSettings:
       filterType: 0
-      simpleNoiseSettings:
-        strength: 0.08
-        numberLayers: 5
-        baseRoughness: 2.85
-        roughness: 2.68
-        persistence: 0.52
-        center: {x: -5.16, y: -2.23, z: -0.06}
-        minValue: 1
-      rigidNoiseSettings:
-        strength: 0.19
-        numberLayers: 5
-        baseRoughness: 0.23
-        roughness: 0.03
-        persistence: 0.45
-        center: {x: 0, y: 0, z: 0}
-        minValue: 1
-        weightMultiplier: 0.36
+      strength: 0.08
+      numberLayers: 5
+      baseRoughness: 2.85
+      roughness: 2.68
+      persistence: 0.52
+      center: {x: 0, y: 0, z: 0}
+      minValue: 1
+      weightMultiplier: 2.14
   oceanSetting:
     enable: 1
     depth: -1
-    baseRoughness: 1.58
+    baseRoughness: 1.47
     roughness: 2.19
     minValue: 0.89
     center: {x: 0, y: 0, z: 0}

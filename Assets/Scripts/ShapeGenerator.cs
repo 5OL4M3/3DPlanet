@@ -5,15 +5,15 @@ using UnityEngine;
 public class ShapeGenerator
 {
     ShapeSettings shapeSettings;
-    INoiseFilter[] noiseFilters;
+    NoiseFilter[] noiseFilters;
 
     public ShapeGenerator(ShapeSettings shapeSettings)
     {
         this.shapeSettings = shapeSettings;
-        noiseFilters = new INoiseFilter[shapeSettings.noiseLayers.Length];
+        noiseFilters = new NoiseFilter[shapeSettings.terrianSetting.Length];
         for (int i = 0; i < noiseFilters.Length; i++)
         {
-            noiseFilters[i] = NoiseFilterFactory.CreateNoiseFilter(shapeSettings.noiseLayers[i].noiseSettings, 0);
+            noiseFilters[i] = new NoiseFilter(shapeSettings.terrianSetting[i].noiseSettings, 0);
         }
     }
 
@@ -31,7 +31,7 @@ public class ShapeGenerator
         if (noiseFilters.Length > 0)
         {
             firstLayerValue = noiseFilters[0].Evaluate(pointOnUnitSphere, seed);
-            if (shapeSettings.noiseLayers[0].enable)
+            if (shapeSettings.terrianSetting[0].enable)
             {
                 elevation += firstLayerValue;
             }
@@ -40,10 +40,9 @@ public class ShapeGenerator
         //Continent Shape
         for (int i = 0; i < noiseFilters.Length; i++)
         {
-            if (shapeSettings.noiseLayers[i].enable)
+            if (shapeSettings.terrianSetting[i].enable)
             {
-                float mask = (shapeSettings.noiseLayers[i].useFirstLayerAsMask) ? firstLayerValue : 1;
-                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere, seed) * mask;
+                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere, seed);
             }
             
         }
