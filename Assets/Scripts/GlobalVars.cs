@@ -124,6 +124,8 @@ public class PlanetSettings
         Tundra,
         Mountain,
         Barren,
+        Grasslands,
+        SnowyMountains,
         None
     }
     public List<(int, float)> Biomes = new List<(int, float)>();

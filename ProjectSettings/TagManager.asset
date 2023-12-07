@@ -7,6 +7,7 @@ TagManager:
   - Settings
   - SolarGenerator
   - Planets
+  - Sun
   layers:
   - Default
   - TransparentFX

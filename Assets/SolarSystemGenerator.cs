@@ -100,44 +100,101 @@ public class SolarSystemGenerator : MonoBehaviour
             //trigger the planet to generate
             _planetScript.GeneratePlanet(_planetScript.PlanetSplitCount);
 
+            //generate moons
+            int _moonCount = _planet.moons.Count;
+            for (int i = 0; i < _moonCount; i++)
+            {
+                //create empty gameobject
+                GameObject _moonObj = new GameObject();
+                _moonObj.name = "Moon" + i;
+                //divide radius by 5
+                float _moonRadius = _planet.planetRadius / 10;
+                //divide distance by 2
+                float _moonDistance = _planet.planetRadius / 6;
+                //ensure at least 3 units away from planet
+                if (_moonDistance < 3)
+                {
+                    _moonDistance += 3;
+                }
+                //set position to planet position + offset
+                _moonObj.transform.position = _planetObj.transform.position;
+                //set scale to planet scale
+                _moonObj.transform.localScale = new Vector3(_moonRadius, _moonRadius, _moonRadius);
+                //place moon at random rotation (set by planet seed) around the planet
+                int _moonSeed = _planet.seed + i;
+                //Random.InitState(_moonSeed);
+                Helpers.SetRandomSeed(_moonSeed);
+                _moonObj.transform.RotateAround(_planetObj.transform.position, Vector3.up, Random.Range(0, 360));
+                float _moonRotationOffset = Random.Range(-80, 80);
+                //tilt moon by random amount so its not one smooth plane relative to the planet (at 0,0,0)
+                _moonObj.transform.RotateAround(_planetObj.transform.position, Vector3.right, _moonRotationOffset);
+                //Random.InitState(System.Environment.TickCount);
+                Helpers.ResetRandomSeed();
+                //tag them as "Planets" for easy cleanup
+                _moonObj.tag = "Planets";
+                //assign a planet rotate script to the moon
+                PlanetRotate _moonRotateScript = GeneratePlanetRotateScript(_moonObj, _planet, true, _planetObj.transform);
+                //assign a planet script to the moon
+                Planet _moonScript = GeneratePlanetScript(_moonObj, _planet, true);
+                //assign shape settings to the moon script
+                _moonScript.shapeSettings = shapeSettings;
+                //trigger the moon to generate
+                _moonScript.GeneratePlanet(_moonScript.PlanetSplitCount);
+                //set moon as child of planet
+                _moonObj.transform.parent = _planetObj.transform;
+                //set moon distance from planet
+                _moonObj.transform.localPosition = new Vector3(_moonDistance, 0, 0);
+
+                //set ismoon
+                _moonScript.isMoon = true;
+
+                //trigger moon to generate terrain
+                _moonScript.GeneratePlanet(_moonScript.PlanetSplitCount);
+            }
+
             _planetCount++;
         }
 
         //check there are no overlapping planets, if there are, move them apart
         GameObject[] _planets = GameObject.FindGameObjectsWithTag("Planets");
-        foreach (GameObject _planet in _planets)
+        foreach (GameObject _planet1 in _planets)
         {
             foreach (GameObject _planet2 in _planets)
             {
-                if (_planet != _planet2)
+                if (_planet1 != _planet2)
                 {
-                    if (Vector3.Distance(_planet.transform.position, _planet2.transform.position) < _planet.transform.localScale.x + _planet2.transform.localScale.x)
+                    if (Vector3.Distance(_planet1.transform.position, _planet2.transform.position) < _planet1.transform.localScale.x + _planet2.transform.localScale.x)
                     {
-                        _planet.transform.position = new Vector3(_planet.transform.position.x + 1, _planet.transform.position.y, _planet.transform.position.z);
+                        _planet1.transform.position = new Vector3(_planet1.transform.position.x + 1, _planet1.transform.position.y, _planet1.transform.position.z);
                     }
                 }
             }
         }
+    
     }
 
     //private function helps generate variables for planets
-    private PlanetRotate GeneratePlanetRotateScript(GameObject _planetObj, PlanetSettings _planet)
+    public PlanetRotate GeneratePlanetRotateScript(GameObject _planetObj, PlanetSettings _planet, bool isMoon=false, Transform centerpoint = null)
     {
         PlanetRotate _planetRotate = _planetObj.AddComponent<PlanetRotate>();
         //slow down rotaton of later planets and larger planets
         _planetRotate.RotateSpeed = _planet.planetOrbitSpeed;
         _planetRotate.RotateSpeed = (_planetRotate.RotateSpeed / (1 + Mathf.Log(_planet.planetRadius)));
-        Debug.Log("Planet Rotate Speed: " + _planetRotate.RotateSpeed);
+        _planetRotate.RotateSpeed /= 3;
+        //Debug.Log("Planet Rotate Speed: " + _planetRotate.RotateSpeed);
         //set the distance from the star
         _planetRotate.DistanceFromStar = _planet.DistanceFromStar;
         //set the planet radius
         //_planetRotate.PlanetRadius = _planet.planetRadius;
         //set the planet rotation speed
         _planetRotate.RotateSpeedSelf = _planet.planetOrbitSpeedSelf;
+        _planetRotate.RotateSpeedSelf /= 3;
+        _planetRotate.Centerpoint = centerpoint;
+        _planetRotate.isMoon = isMoon;
         return _planetRotate;
     }
 
-    private Planet GeneratePlanetScript(GameObject _planetObj, PlanetSettings _planet)
+    public Planet GeneratePlanetScript(GameObject _planetObj, PlanetSettings _planet, bool isMoon=false)
     {
         Planet _planetScript = _planetObj.AddComponent<Planet>();
         //set the planet radius
@@ -149,9 +206,85 @@ public class SolarSystemGenerator : MonoBehaviour
         //Create list if tuples for biomes probabilities
         _planet.Biomes = new List<(int, float)>();
         //add biomes to list
-        _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Desert, 0.2f));
+        float _desertProb = 0.1f;
+        float _forestProb = 0.1f;
+        float _tundraProb = 0.1f;
+        float _mountainProb = 0.1f;
+        float _barrenProb = 0.1f;
+        float _grasslandsProb = 0.1f;
+        float _snowyMountainsProb = 0.1f;
+        bool havePoles = true;
+        //set biome probabilities based on temperature
+        if (_planetTemperature < 20)
+        {
+            _tundraProb = 0.3f;
+            _snowyMountainsProb = 0.3f;
+            _mountainProb = 0.2f;
+            _barrenProb = 0.1f;
+            _grasslandsProb = 0.1f;
+            _desertProb = 0.0f;
+            _forestProb = 0.0f;
+        } else if (_planetTemperature < 40)
+        {
+            _tundraProb = 0.2f;
+            _snowyMountainsProb = 0.2f;
+            _mountainProb = 0.1f;
+            _barrenProb = 0.1f;
+            _grasslandsProb = 0.2f;
+            _desertProb = 0.1f;
+            _forestProb = 0.1f;
+        } else if (_planetTemperature < 60)
+        {
+            _tundraProb = 0.1f;
+            _snowyMountainsProb = 0.1f;
+            _mountainProb = 0.1f;
+            _barrenProb = 0.1f;
+            _grasslandsProb = 0.2f;
+            _desertProb = 0.2f;
+            _forestProb = 0.2f;
+        } else if (_planetTemperature < 80)
+        {
+            _tundraProb = 0.0f;
+            _snowyMountainsProb = 0.0f;
+            _mountainProb = 0.1f;
+            _barrenProb = 0.1f;
+            _grasslandsProb = 0.2f;
+            _desertProb = 0.2f;
+            _forestProb = 0.4f;
+        } else
+        {
+            _tundraProb = 0.0f;
+            _snowyMountainsProb = 0.0f;
+            _mountainProb = 0.0f;
+            _barrenProb = 0.1f;
+            _grasslandsProb = 0.1f;
+            _desertProb = 0.2f;
+            _forestProb = 0.6f;
+            havePoles = false;
+        }
+        if (!isMoon)
+        {
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Mountain, _mountainProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Tundra, _tundraProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.SnowyMountains, _snowyMountainsProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Grasslands, _grasslandsProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Desert, _desertProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Forest, _forestProb));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Barren, _barrenProb));
+        } else {
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Barren, 0.7f));
+            _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Mountain, 0.3f));
+        }
+        
 
+        
+
+        //Debug.Log("Temperature: " + _planetTemperature);
+        //Debug.Log("Planet Mass: " + _planetMass);
         _planetScript.biomeProbabilities = _planet.Biomes;
+        _planetScript.havePoles = havePoles;
+        _planetScript.planetMass = _planetMass;
+        _planetScript.planetTemperature = _planetTemperature;
 
         
 
@@ -188,8 +321,5 @@ public class SolarSystemGenerator : MonoBehaviour
             DestroyImmediate(_planet);
         }
     }
-
-    
-
-    
 }
+

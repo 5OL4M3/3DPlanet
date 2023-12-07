@@ -8,6 +8,8 @@ public class PlanetRotate : MonoBehaviour
     public float RotateSpeed;
     public float RotateSpeedSelf;
     public float DistanceFromStar;
+    public Transform Centerpoint;
+    public bool isMoon = false;
     //public float PlanetRadius;
     private GlobalVars globalSettings;
 
@@ -43,6 +45,16 @@ public class PlanetRotate : MonoBehaviour
         Debug.Log("Global Setting Seed: " + globalSettings.seed);
 
         RotateSolarSystem = globalSettings.RotateSolarSystem;
+        if (isMoon)
+        {
+            RotateSpeed = 10;
+            RotateSpeedSelf = 10;
+            DistanceFromStar = 5;
+        }
+        else {
+            //set centerpoint to sun
+            Centerpoint = GameObject.FindGameObjectWithTag("Sun").transform;
+        }
     }
 
     //fixed update for physics
@@ -50,7 +62,7 @@ public class PlanetRotate : MonoBehaviour
     {
         if (RotateSolarSystem)
         {
-            transform.RotateAround(Vector3.zero, Vector3.up, globalSettings.RotateSpeed * RotateSpeed * Time.deltaTime);
+            transform.RotateAround(Centerpoint.transform.position, Vector3.up, globalSettings.RotateSpeed * RotateSpeed * Time.deltaTime);
 
             //rotate around own axis
             transform.Rotate(Vector3.up * RotateSpeedSelf * Time.deltaTime);

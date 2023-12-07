@@ -20,7 +20,8 @@ public class NoiseFilter : INoiseFilter
 
         for (int i = 0; i < settings.numberLayers; i++)
         {
-            noiseVal += (noise.Evaluate(point * frequency + settings.center) + 1) / 2 * amplitude;
+            noiseVal += ((noise.Evaluate(point * frequency + settings.center) + 1) / 2 * amplitude);
+            //noiseVal += ((Mathf.PerlinNoise(point.x * frequency + settings.center.x, point.y * frequency + settings.center.y) + 1) / 2 * amplitude);
             frequency *= settings.roughness;
             amplitude *= settings.persistence;
         }

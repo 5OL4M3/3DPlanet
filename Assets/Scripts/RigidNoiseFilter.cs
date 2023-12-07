@@ -21,7 +21,9 @@ public class RigidNoiseFilter : INoiseFilter
 
         for (int i = 0; i < settings.numberLayers; i++)
         {
+            //noiseVal += ((Mathf.PerlinNoise(point.x * frequency + settings.center.x, point.y * frequency + settings.center.y) + 1) / 2 * amplitude);
             float v = 1 - Mathf.Abs(noise.Evaluate(point * frequency + settings.center));
+            //float v = 1 - Mathf.Abs(Mathf.PerlinNoise(point.x * frequency + settings.center.x, point.y * frequency + settings.center.y));
             v *= v;
             v *= weight;
             weight = Mathf.Clamp01(v * settings.weightMultiplier);
