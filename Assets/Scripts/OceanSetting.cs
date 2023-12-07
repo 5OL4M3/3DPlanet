@@ -17,15 +17,20 @@ public class OceanSetting
 
     Noise noise = new Noise();
 
-    public float Evaluate(Vector3 point)
+    public float Evaluate(Vector3 point, int seed)
     {
         float noiseVal = 0;
         float frequency = baseRoughness;
         float amplitude = 1;
 
+        //add seed offset to center
+        seed *= 3;
+        seed %= 100;
+        Vector3 offset = new Vector3(center.x + seed, center.y + seed, center.z + seed);
+
         for (int i = 0; i < numberLayers; i++)
         {
-            noiseVal += (noise.Evaluate(point * frequency + center) + 1) / 2 * amplitude;
+            noiseVal += (noise.Evaluate(point * frequency + offset) + 1) / 2 * amplitude;
             frequency *= roughness;
             amplitude *= persistence;
         }

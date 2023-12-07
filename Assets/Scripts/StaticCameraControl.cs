@@ -21,17 +21,31 @@ public class StaticCameraControl : MonoBehaviour
 
     void Start()
     {   
-        GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>();
-        foreach (GameObject obj in allGameObjects)
+        GameObject sunobj = GameObject.FindGameObjectWithTag("Sun");
+        if (sunobj == null)
         {
-            // Check if the GameObject's name contains the word "planet"
-            if (obj.name.ToLower().Contains("planet") || obj.name.ToLower().Contains("sun"))
-            {
-                // This GameObject has "planet" in its name
-                observablePlanets.Add(obj);
-                //Debug.Log("Found planet: " + obj.name);
-            }
+            Debug.LogError("No sun found");
+            return;
         }
+
+        GameObject[] planets = GameObject.FindGameObjectsWithTag("Planets");
+        if (planets.Length == 0)
+        {
+            Debug.LogError("No planets found");
+            return;
+        }
+
+        foreach (GameObject planet in planets)
+        {
+            observablePlanets.Add(planet);
+        }
+
+        sun = sunobj.transform;
+
+        //sort by alphabetical
+        observablePlanets.Sort((x, y) => string.Compare(x.name, y.name));
+        //put sun first, remove old ref
+        observablePlanets.Insert(0, sunobj);
 
         target = observablePlanets[iteration].transform;
         zoomVal = target.localScale.x * 2;
@@ -51,6 +65,12 @@ public class StaticCameraControl : MonoBehaviour
         HandleMouseScroll();
         _updateTMPTextIndicator();
 
+        //break if no change
+        if (target == null)
+        {
+            return;
+        }
+
         if (target.gameObject.name.ToLower().Contains("sun"))
         {
             transform.position = target.position + birdEyeZoomVal * birdEyeDirection.normalized + offset;
@@ -58,13 +78,6 @@ public class StaticCameraControl : MonoBehaviour
         }
         else if (target != null)
         {
-            // Vector3 direction = target.position - sun.position;
-            
-            // transform.position = target.position + zoomVal * direction.normalized + offset;
-            
-            // //Debug.Log(direction);
-
-            // transform.LookAt(target);
             float horizontalInput = 0.0f;
             float verticalInput = 0.0f;
 
@@ -110,10 +123,18 @@ public class StaticCameraControl : MonoBehaviour
         string name = target.gameObject.name;
         if (name.ToLower().Contains("sun"))
         {
-            name = observablePlanets[0].name;
-            //trim numerals from end by breaking at first space 
-            name = name.Split(' ')[1];
+            name = observablePlanets[1].name;
             Debug.Log("Name: " + name);
+            //trim numerals from end by breaking at first space 
+            //splits
+            string[] splitName = name.Split(' ');
+            if (splitName.Length == 3)
+            {
+                name = splitName[1];
+            } else {
+                name = splitName[1] + " " + splitName[2];
+            }
+            //Debug.Log("Name: " + name);
         }
         //remove "sun" and "planet" from name, correct formatting
         name = name.Replace("Sun", "");

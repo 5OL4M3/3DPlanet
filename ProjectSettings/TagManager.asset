@@ -8,6 +8,7 @@ TagManager:
   - SolarGenerator
   - Planets
   - Sun
+  - Moons
   layers:
   - Default
   - TransparentFX

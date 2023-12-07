@@ -13,7 +13,7 @@ public class TerrainFace
     Vector3 axisB;
     int planetSplits;
 
-    public delegate Vector3 GeneratorDelegate(Vector3 pos);
+    public delegate Vector3 GeneratorDelegate(Vector3 pos, int seed);
     public GeneratorDelegate oceanMeshCallback;
     public GeneratorDelegate landMeshCallback;
 
@@ -29,7 +29,7 @@ public class TerrainFace
         axisB = Vector3.Cross(normal, axisA);
     }
 
-    public void ConstructMesh(GeneratorDelegate generatorFunction, MeshFilter[] meshFilters)
+    public void ConstructMesh(GeneratorDelegate generatorFunction, MeshFilter[] meshFilters, int planetSeed)
     {
         Assert.IsTrue(resolution % planetSplits == 0);
         Assert.IsTrue(resolution >= planetSplits * planetSplits);
@@ -87,7 +87,7 @@ public class TerrainFace
                         Vector3 pointOnUnitCube = normal + (percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB;
                         Vector3 pointOnUnitSphere = pointOnUnitCube.normalized;
 
-                        vertices[i] = generatorFunction(pointOnUnitSphere);
+                        vertices[i] = generatorFunction(pointOnUnitSphere, planetSeed);
 
                         //If not the last col or the last row
                         if (col != pieceRes - 1 && row != pieceRes - 1)
@@ -123,14 +123,14 @@ public class TerrainFace
     public void ConstructOceanMesh(MeshFilter[] meshFilters)
     {
         oceanMeshCallback = shapeGenerator.CalculatePointOnOcean;
-        ConstructMesh(oceanMeshCallback, meshFilters);
+        ConstructMesh(oceanMeshCallback, meshFilters, 0);
         Debug.Log("Finished constructing ocean mesh");
     }
 
-    public void ConstructLandMesh(MeshFilter[] meshFilters)
+    public void ConstructLandMesh(MeshFilter[] meshFilters, int planetSeed)
     {
         landMeshCallback = shapeGenerator.CalculatePointOnPlanet;
-        ConstructMesh(landMeshCallback, meshFilters);
+        ConstructMesh(landMeshCallback, meshFilters, planetSeed);
         Debug.Log("Finished constructing land mesh");
     }
 }

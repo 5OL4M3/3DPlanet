@@ -7,20 +7,27 @@ public class NoiseFilter : INoiseFilter
     NoiseSettings.SimpleNoiseSettings settings;
     Noise noise = new Noise();
 
-    public NoiseFilter(NoiseSettings.SimpleNoiseSettings settings)
+    public NoiseFilter(NoiseSettings.SimpleNoiseSettings settings, int seed)
     {
         this.settings = settings;
+
     }
 
-    public float Evaluate(Vector3 point)
+    public float Evaluate(Vector3 point, int seed)
     {
         float noiseVal = 0;
         float frequency = settings.baseRoughness;
         float amplitude = 1;
 
+        //add seed offset to center
+        seed *= 5;
+        seed %= 100;
+        
+        Vector3 offset = new Vector3(settings.center.x + seed, settings.center.y + seed, settings.center.z + seed);
+
         for (int i = 0; i < settings.numberLayers; i++)
         {
-            noiseVal += ((noise.Evaluate(point * frequency + settings.center) + 1) / 2 * amplitude);
+            noiseVal += ((noise.Evaluate(point * frequency + offset) + 1) / 2 * amplitude);
             //noiseVal += ((Mathf.PerlinNoise(point.x * frequency + settings.center.x, point.y * frequency + settings.center.y) + 1) / 2 * amplitude);
             frequency *= settings.roughness;
             amplitude *= settings.persistence;

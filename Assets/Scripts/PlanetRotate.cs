@@ -10,6 +10,7 @@ public class PlanetRotate : MonoBehaviour
     public float DistanceFromStar;
     public Transform Centerpoint;
     public bool isMoon = false;
+    public bool rotateSelf = false;
     //public float PlanetRadius;
     private GlobalVars globalSettings;
 
@@ -49,7 +50,6 @@ public class PlanetRotate : MonoBehaviour
         {
             RotateSpeed = 10;
             RotateSpeedSelf = 10;
-            DistanceFromStar = 5;
         }
         else {
             //set centerpoint to sun
@@ -65,7 +65,8 @@ public class PlanetRotate : MonoBehaviour
             transform.RotateAround(Centerpoint.transform.position, Vector3.up, globalSettings.RotateSpeed * RotateSpeed * Time.deltaTime);
 
             //rotate around own axis
-            transform.Rotate(Vector3.up * RotateSpeedSelf * Time.deltaTime);
+            if (rotateSelf)
+                transform.Rotate(Vector3.up * RotateSpeedSelf * Time.deltaTime);
         }
     }
     

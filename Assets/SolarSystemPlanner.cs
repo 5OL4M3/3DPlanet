@@ -47,8 +47,8 @@ public class SolarSystemPlanner : MonoBehaviour
             globalSettings = _GlobalsLoaderCompt.globalVars;
             Debug.Log("Global settings Found");
         }
-        Debug.Log("Global settings: " + globalSettings);
-        Debug.Log("Global Setting Seed: " + globalSettings.seed);
+        //Debug.Log("Global settings: " + globalSettings);
+        //Debug.Log("Global Setting Seed: " + globalSettings.seed);
     }
 
 
@@ -144,7 +144,7 @@ public class SolarSystemPlanner : MonoBehaviour
 
         float numberOfPlanetsFloat = Random.Range(defPlanet.AveragePlanets - defPlanet.PlanetVarience, defPlanet.AveragePlanets + defPlanet.PlanetVarience);
         int numberOfPlanets = Mathf.RoundToInt(numberOfPlanetsFloat);
-        Debug.Log("Number of planets: " + numberOfPlanets);
+        //Debug.Log("Number of planets: " + numberOfPlanets);
         for (int i = 0; i < numberOfPlanets; i++)
         {
             PlanetSettings planetSettings = new PlanetSettings();
@@ -170,7 +170,7 @@ public class SolarSystemPlanner : MonoBehaviour
 
             float numberOfMoonsFloat = Random.Range(AverageMoons - MoonVarience, AverageMoons + MoonVarience);
             int numberOfMoons = Mathf.RoundToInt(numberOfMoonsFloat);
-            Debug.Log("Number of Moons: " + numberOfMoons);
+            //Debug.Log("Number of Moons: " + numberOfMoons);
 
             for (int j = 0; j < numberOfMoons; j++)
             {

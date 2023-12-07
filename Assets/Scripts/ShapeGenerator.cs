@@ -13,11 +13,11 @@ public class ShapeGenerator
         noiseFilters = new INoiseFilter[shapeSettings.noiseLayers.Length];
         for (int i = 0; i < noiseFilters.Length; i++)
         {
-            noiseFilters[i] = NoiseFilterFactory.CreateNoiseFilter(shapeSettings.noiseLayers[i].noiseSettings);
+            noiseFilters[i] = NoiseFilterFactory.CreateNoiseFilter(shapeSettings.noiseLayers[i].noiseSettings, 0);
         }
     }
 
-    public Vector3 CalculatePointOnPlanet(Vector3 pointOnUnitSphere)
+    public Vector3 CalculatePointOnPlanet(Vector3 pointOnUnitSphere, int seed)
     {
         float elevation = 0;
         float firstLayerValue = 0;
@@ -25,12 +25,12 @@ public class ShapeGenerator
         //Ocean Layer
         if (shapeSettings.oceanSetting.enable)
         {
-            oceanLayer = shapeSettings.oceanSetting.Evaluate(pointOnUnitSphere);
+            oceanLayer = shapeSettings.oceanSetting.Evaluate(pointOnUnitSphere, seed);
         }
 
         if (noiseFilters.Length > 0)
         {
-            firstLayerValue = noiseFilters[0].Evaluate(pointOnUnitSphere);
+            firstLayerValue = noiseFilters[0].Evaluate(pointOnUnitSphere, seed);
             if (shapeSettings.noiseLayers[0].enable)
             {
                 elevation += firstLayerValue;
@@ -43,7 +43,7 @@ public class ShapeGenerator
             if (shapeSettings.noiseLayers[i].enable)
             {
                 float mask = (shapeSettings.noiseLayers[i].useFirstLayerAsMask) ? firstLayerValue : 1;
-                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere) * mask;
+                elevation += noiseFilters[i].Evaluate(pointOnUnitSphere, seed) * mask;
             }
             
         }
@@ -52,7 +52,7 @@ public class ShapeGenerator
         return pointOnUnitSphere * shapeSettings.planetRadius * (1 + elevation);
     }
 
-    public Vector3 CalculatePointOnOcean(Vector3 pointOnUnitSphere)
+    public Vector3 CalculatePointOnOcean(Vector3 pointOnUnitSphere, int seed)
     {
         return pointOnUnitSphere * shapeSettings.planetRadius;
     }

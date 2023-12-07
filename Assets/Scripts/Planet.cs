@@ -180,6 +180,7 @@ public class Planet : MonoBehaviour
             oceanmat.SetTexture("_Normal_Map", tex);
         }
         
+        
         setToBiomesDebug(mfland);
         debugPrintBiomesProbs();
         //subDivideMeshes(meshFilters);
@@ -230,7 +231,7 @@ public class Planet : MonoBehaviour
 
         if (_meshFilters[0].gameObject.activeSelf)
         {
-            terrainFaces[0].ConstructLandMesh(_meshFilters);
+            terrainFaces[0].ConstructLandMesh(_meshFilters, planetSeed);
         }
 
         //rename the rest of the meshes
@@ -331,21 +332,23 @@ public class Planet : MonoBehaviour
                 }
             }
             AvgWorldheight /= vertices.Length;
-            //Debug.Log("MESH1 Avg world height: " + AvgWorldheight);
             if (AvgWorldheight < minAvgHeightPolar)
             {
-                //Debug.Log("MESH1 Avg world height: " + AvgWorldheight + " is less than minHeight: " + minAvgHeightPolar);
                 minAvgHeightPolar = AvgWorldheight;
             }
             if (AvgWorldheight > maxAvgHeightPolar)
             {
-                //Debug.Log("MESH1 Avg world height: " + AvgWorldheight + " is greater than maxHeight: " + maxAvgHeightPolar);
                 maxAvgHeightPolar = AvgWorldheight;
             }
         }
-        //Debug.Log("Min height: " + minHeight + " Max height: " + maxHeight);
-        //Debug.Log("MinMax avg height: " + minAvgHeightPolar + " Max avg height: " + maxAvgHeightPolar);
-        //Debug.Log("Number of meshes: " + mfs.Length);
+
+        //make a folder for plants as a child to the planet
+        GameObject plantsFolder = new GameObject("plants");
+        plantsFolder.transform.parent = transform;
+        plantsFolder.transform.localPosition = Vector3.zero;
+        plantsFolder.transform.localScale = Vector3.one;
+
+
         foreach (MeshFilter filter in mfs)
         {
             //get average world height and average spherical height
@@ -368,7 +371,6 @@ public class Planet : MonoBehaviour
             sphereheight /= vertices.Length;
             //normalize sphere height between 0 and 1
             sphereheight = (sphereheight - minHeight) / (maxHeight - minHeight);
-            //Debug.Log("MESH Avg world height: " + worldheight + " Avg spherical height: " + sphereheight);
 
             bool isPolarCap = false;
             if (worldheight < minAvgHeightPolar + 0.1f || worldheight > maxAvgHeightPolar - 0.1f)
@@ -392,7 +394,6 @@ public class Planet : MonoBehaviour
                 isFlat = false;
                 isRough = false;
             }
-            //Debug.Log("isPolarCap: " + isPolarCap + " isFlat: " + isFlat + " isRough: " + isRough + " sphereheight: " + sphereheight + " minHeight: " + minHeight + " maxHeight: " + maxHeight);
 
             float rand = Random.Range(0.0f, 1.0f);
             int biomeIndex = 0;
@@ -506,6 +507,12 @@ public class Planet : MonoBehaviour
                 }
             }
 
+            //set to barren if moon
+            if (isMoon)
+            {
+                biomeIndex = (int)_BiomesPlanets.Mountain;
+            }
+
 
             //set color based on biome
             switch ((_BiomesPlanets)biomeIndex)
@@ -548,12 +555,13 @@ public class Planet : MonoBehaviour
                     Debug.Log("Biome not found");
                     break;
             }
+            
 
             //if biome is Forest, add trees
             if ((_BiomesPlanets)biomeIndex == _BiomesPlanets.Forest)
             {
                 //tree chance
-                float treeChance = 0.01f;
+                float treeChance = 0.02f;
 
                 //get mesh vertices
                 Mesh meshForest = filter.sharedMesh;
@@ -569,16 +577,6 @@ public class Planet : MonoBehaviour
                         Vector3 vertex = vertices[i];
                         //get vertex world position
                         Vector3 vertexWorldPos = filter.transform.TransformPoint(vertex);
-
-                        //if the vertex is below sea level, continue
-                        float distanceFromCenter = Vector3.Distance(vertexWorldPos, transform.position);
-                        float height = planetRadius - distanceFromCenter;
-                        if (distanceFromCenter < 2)
-                        {
-                            continue;
-                        }
-                        Debug.Log("height: " + height + " planetRadius: " + planetRadius + " distanceFromCenter: " + distanceFromCenter);
-
                         //get random tree
                         GameObject tree = Resources.Load("Tree1") as GameObject;
                         //instantiate tree
@@ -594,12 +592,15 @@ public class Planet : MonoBehaviour
                         treeInstance.transform.rotation = Quaternion.FromToRotation(Vector3.up, vertexWorldPos - transform.position);
                         //set tree scale to 0.1
                         treeInstance.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+                        //move the tree to folder
+                        treeInstance.transform.parent = plantsFolder.transform;
                     }
                 }
-            } else if((_BiomesPlanets)biomeIndex == _BiomesPlanets.Desert)
+            } else if((_BiomesPlanets)biomeIndex == _BiomesPlanets.Desert && !isMoon)
             {
                 //tree chance
-                float treeChance = 0.01f;
+                float treeChance = 0.015f;
 
                 //get mesh vertices
                 Mesh meshForest = filter.sharedMesh;
@@ -615,16 +616,6 @@ public class Planet : MonoBehaviour
                         Vector3 vertex = vertices[i];
                         //get vertex world position
                         Vector3 vertexWorldPos = filter.transform.TransformPoint(vertex);
-
-                        //if the vertex is below sea level, continue
-                        float distanceFromCenter = Vector3.Distance(vertexWorldPos, transform.position);
-                        float height = planetRadius - distanceFromCenter;
-                        if (distanceFromCenter < 2)
-                        {
-                            continue;
-                        }
-                        Debug.Log("Biome Name: " + (_BiomesPlanets)biomeIndex + " height: " + height + " planetRadius: " + planetRadius + " distanceFromCenter: " + distanceFromCenter);
-
                         //get random tree
                         GameObject tree = Resources.Load("Cactus") as GameObject;
                         //instantiate tree
@@ -632,7 +623,7 @@ public class Planet : MonoBehaviour
                         //set tree parent to planet
                         treeInstance.transform.parent = transform;
                         //set tree position to vertex world position
-                        Vector3 offset = (transform.position - vertexWorldPos).normalized * -0.15f;
+                        Vector3 offset = (transform.position - vertexWorldPos).normalized * -0.12f;
                         //set tree position to vertex world position
                         treeInstance.transform.position = vertexWorldPos + offset;
 
@@ -643,12 +634,15 @@ public class Planet : MonoBehaviour
 
                         //set tree scale to 0.1
                         treeInstance.transform.localScale = new Vector3(0.006f, 0.006f, 0.006f);
+
+                        //move the tree to folder
+                        treeInstance.transform.parent = plantsFolder.transform;
                     }
                 }
             } else if((_BiomesPlanets)biomeIndex == _BiomesPlanets.Grasslands)
             {
                 //tree chance
-                float treeChance = 0.04f;
+                float treeChance = 0.05f;
 
                 //get mesh vertices
                 Mesh meshForest = filter.sharedMesh;
@@ -664,15 +658,6 @@ public class Planet : MonoBehaviour
                         Vector3 vertex = vertices[i];
                         //get vertex world position
                         Vector3 vertexWorldPos = filter.transform.TransformPoint(vertex);
-
-                        //if the vertex is below sea level, continue
-                        float distanceFromCenter = Vector3.Distance(vertexWorldPos, transform.position);
-                        float height = planetRadius - distanceFromCenter;
-                        if (distanceFromCenter < 2)
-                        {
-                            continue;
-                        }
-
                         //get random tree
                         GameObject tree = Resources.Load("Grass") as GameObject;
                         //instantiate tree
@@ -680,7 +665,7 @@ public class Planet : MonoBehaviour
                         //set tree parent to planet
                         treeInstance.transform.parent = transform;
                         //set tree position to vertex world position
-                        Vector3 offset = (transform.position - vertexWorldPos).normalized * -0.03f;
+                        Vector3 offset = (transform.position - vertexWorldPos).normalized * -0.02f;
                         //set tree position to vertex world position
                         treeInstance.transform.position = vertexWorldPos + offset;
 
@@ -688,7 +673,22 @@ public class Planet : MonoBehaviour
                         treeInstance.transform.rotation = Quaternion.FromToRotation(Vector3.up, vertexWorldPos - transform.position);
                         //set tree scale to 0.1
                         treeInstance.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+
+                        //move the tree to folder
+                        treeInstance.transform.parent = plantsFolder.transform;
                     }
+                }
+            }
+
+            //cull any trees that are under the ocean
+            foreach (Transform child in plantsFolder.transform)
+            {
+                float distanceFromCenter = Vector3.Distance(child.position, transform.position);
+                float height = planetRadius - distanceFromCenter;
+                if (distanceFromCenter < 3f)
+                {
+                    //Debug.Log("child: " + child.position + " distance: " + distanceFromCenter + " height: " + height);
+                    DestroyImmediate(child.gameObject);
                 }
             }
         }

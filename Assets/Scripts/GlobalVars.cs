@@ -74,18 +74,18 @@ public class DefaultPlanetSettings
     public float planetOrbitSpeedSelfBaseMin = 10;
     public float planetOrbitSpeedSelfBaseMax = 40;
 
-    public float minDistanceBetweenMoonsVarience = 20;
-    public float minDistanceBetweenMoonsBaseMin = 20;
-    public float minDistanceBetweenMoonsBaseMax = 80;
+    public float minDistanceBetweenMoonsVarience = 15;
+    public float minDistanceBetweenMoonsBaseMin = 15;
+    public float minDistanceBetweenMoonsBaseMax = 60;
 
-    public float DistanceFromStarVarience = 20;
-    public float DistanceFromStarBaseMin = 40;
-    public float DistanceFromStarBaseMax = 200;
+    public float DistanceFromStarVarience = 35;
+    public float DistanceFromStarBaseMin = 35;
+    public float DistanceFromStarBaseMax = 160;
 
-    public float AverageMoons = 2;
+    public float AverageMoons = 3;
     public float MoonVarience = 1;
 
-    public float AveragePlanets = 4;
+    public float AveragePlanets = 5;
     public float PlanetVarience = 2;
 
     public string name = "Planet";
