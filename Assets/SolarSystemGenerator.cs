@@ -8,6 +8,7 @@ public class SolarSystemGenerator : MonoBehaviour
 {
     [SerializeField]
     public ShapeSettings shapeSettings;
+    public ShapeSettings moonSettings;
 
     private SolarSystemPlan setsolarSystemPlan;
 
@@ -91,6 +92,9 @@ public class SolarSystemGenerator : MonoBehaviour
             //assign a planet script to the planet
             Planet _planetScript = GeneratePlanetScript(_planetObj, _planet);
 
+            _planetScript.isMoon = false;
+            _planetScript.planetSeed = _planetSeed;
+
             //assign an atmosphere to the planet
             AttachAtmosphereToGO(_planetObj, _planet);
 
@@ -108,9 +112,9 @@ public class SolarSystemGenerator : MonoBehaviour
                 GameObject _moonObj = new GameObject();
                 _moonObj.name = "Moon" + i;
                 //divide radius by 5
-                float _moonRadius = _planet.planetRadius / 10;
+                float _moonRadius = _planet.planetRadius;
                 //divide distance by 2
-                float _moonDistance = _planet.planetRadius / 6;
+                float _moonDistance = _planet.planetRadius / 10;
                 //ensure at least 3 units away from planet
                 if (_moonDistance < 3)
                 {
@@ -137,17 +141,13 @@ public class SolarSystemGenerator : MonoBehaviour
                 //assign a planet script to the moon
                 Planet _moonScript = GeneratePlanetScript(_moonObj, _planet, true);
                 //assign shape settings to the moon script
-                _moonScript.shapeSettings = shapeSettings;
-                //trigger the moon to generate
-                _moonScript.GeneratePlanet(_moonScript.PlanetSplitCount);
+                _moonScript.shapeSettings = moonSettings;
+                //set ismoon
+                _moonScript.isMoon = true;
                 //set moon as child of planet
                 _moonObj.transform.parent = _planetObj.transform;
                 //set moon distance from planet
                 _moonObj.transform.localPosition = new Vector3(_moonDistance, 0, 0);
-
-                //set ismoon
-                _moonScript.isMoon = true;
-
                 //trigger moon to generate terrain
                 _moonScript.GeneratePlanet(_moonScript.PlanetSplitCount);
             }
@@ -271,7 +271,6 @@ public class SolarSystemGenerator : MonoBehaviour
             _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Desert, _desertProb));
             _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Forest, _forestProb));
             _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Barren, _barrenProb));
-        } else {
             _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Barren, 0.7f));
             _planet.Biomes.Add(((int)PlanetSettings.BiomesPlanets.Mountain, 0.3f));
         }

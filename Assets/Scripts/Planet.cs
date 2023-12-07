@@ -62,8 +62,8 @@ public class Planet : MonoBehaviour
 
 
     private Vector3 TowardsPlanetCenter = new Vector3(0, 0, 0);
-    public bool isMoon = false;
-    
+    public bool isMoon;
+    public int planetSeed = 0;
 
 
 
@@ -146,7 +146,7 @@ public class Planet : MonoBehaviour
         //check for old meshes in children, delete if name includes "planetmesh" or "oceanmesh"
         foreach (Transform child in transform)
         {
-            if (child.name.Contains("submesh") || child.name.Contains("oceanmesh") || child.name.Contains("meshes"))
+            if (child.name.Contains("submesh") || child.name.Contains("ocean") || child.name.Contains("meshes"))
             {
                 DestroyImmediate(child.gameObject);
             }
@@ -163,20 +163,23 @@ public class Planet : MonoBehaviour
         //ScalePlanetDownToNormalSizeMF(mfocean);
 
         //create a sphere gameobject for the ocean
-        GameObject oceanobj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        oceanobj.name = "ocean";
-        oceanobj.transform.parent = transform;
-        oceanobj.transform.localPosition = Vector3.zero;
-        oceanobj.transform.localScale = Vector3.one;
-        //assign "OceanShader" to ocean
-        Material oceanmat = new Material(Shader.Find("Shader Graphs/OceanShader"));
-        oceanobj.GetComponent<Renderer>().sharedMaterial = oceanmat;   
-        //assign the "RoughWater" texture to the ocean shader
-        Texture2D tex = Resources.Load("RoughWater") as Texture2D; 
-        //Debug.Log("tex: " + tex);
-        oceanmat.SetTexture("_Normal_Map", tex);
-
-
+        //Check if the current gameobject is called moon
+        if (!isMoon)
+        {
+            GameObject oceanobj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            oceanobj.name = "ocean";
+            oceanobj.transform.parent = transform;
+            oceanobj.transform.localPosition = Vector3.zero;
+            oceanobj.transform.localScale = Vector3.one;
+            //assign "OceanShader" to ocean
+            Material oceanmat = new Material(Shader.Find("Shader Graphs/OceanShader"));
+            oceanobj.GetComponent<Renderer>().sharedMaterial = oceanmat;   
+            //assign the "RoughWater" texture to the ocean shader
+            Texture2D tex = Resources.Load("RoughWater") as Texture2D; 
+            //Debug.Log("tex: " + tex);
+            oceanmat.SetTexture("_Normal_Map", tex);
+        }
+        
         setToBiomesDebug(mfland);
         debugPrintBiomesProbs();
         //subDivideMeshes(meshFilters);
@@ -413,7 +416,7 @@ public class Planet : MonoBehaviour
             Color MountainGrey = new Color(48f / 255f, 48f / 255f, 48f / 255f);
 
             //99, 99, 99
-            Color MoonGrey = new Color(99f / 255f, 99f / 255f, 99f / 255f);
+            Color MoonGrey = new Color(144f, 144f, 144f);
 
             //set barrengrey to moongrey if moon
             if (isMoon)
